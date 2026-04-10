@@ -21,6 +21,6 @@ class Tenant extends Model
 
     public function owner()
     {
-        return $this->hasOne(User::class)->whereNull('tenant_id', false); // Users with this tenant_id
+        return $this->hasOne(User::class);
     }
 }
