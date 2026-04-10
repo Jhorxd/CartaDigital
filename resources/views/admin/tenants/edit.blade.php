@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Crear Nuevo Restaurante (Tenant)') }}
+            {{ __('Editar Restaurante') }}: {{ $tenant->name }}
         </h2>
     </x-slot>
 
@@ -10,8 +10,9 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
-                    <form method="POST" action="{{ route('tenants.store') }}" class="space-y-8">
+                    <form method="POST" action="{{ route('tenants.update', $tenant) }}" class="space-y-8">
                         @csrf
+                        @method('PUT')
                         
                         <!-- Sección Restaurante -->
                         <div class="border-b pb-4">
@@ -19,14 +20,14 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="name" :value="__('Nombre del Negocio')" />
-                                    <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
+                                    <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $tenant->name)" required />
                                     <x-input-error class="mt-2" :messages="$errors->get('name')" />
                                 </div>
 
                                 <div>
-                                    <x-input-label for="subdomain" :value="__('Subdominio (ej: polleria)')" />
+                                    <x-input-label for="subdomain" :value="__('Subdominio')" />
                                     <div class="flex items-center mt-1">
-                                        <x-text-input id="subdomain" name="subdomain" type="text" class="block w-full rounded-r-none border-r-0" :value="old('subdomain')" required />
+                                        <x-text-input id="subdomain" name="subdomain" type="text" class="block w-full rounded-r-none border-r-0" :value="old('subdomain', $tenant->subdomain)" required />
                                         <span class="inline-flex items-center px-4 py-2 border border-gray-300 bg-gray-50 text-gray-500 text-sm rounded-r-md">
                                             .localhost
                                         </span>
@@ -38,28 +39,33 @@
 
                         <!-- Sección Credenciales -->
                         <div>
-                            <h3 class="text-lg font-bold text-gray-700 mb-4">🔑 Credenciales de Acceso</h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-bold text-gray-700">🔑 Credenciales de Acceso</h3>
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">PROPIETARIO</span>
+                            </div>
+                            
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="email" :value="__('Email del Propietario')" />
-                                    <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required />
+                                    <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $tenant->owner->email ?? '')" required />
                                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                                 </div>
 
                                 <div>
-                                    <x-input-label for="password" :value="__('Contraseña Inicial')" />
-                                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" required />
+                                    <x-input-label for="password" :value="__('Nueva Contraseña')" />
+                                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" placeholder="Dejar en blanco para no cambiar" />
+                                    <p class="text-[10px] text-gray-500 mt-1 uppercase italic">Solo llena este campo si deseas resetear la clave del dueño.</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('password')" />
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-4 pt-6 border-t">
-                            <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none transition ease-in-out duration-150">
-                                Cancelar
+                        <div class="flex items-center gap-4 pt-6 border-t font-sans">
+                            <a href="{{ route('dashboard') }}" class="text-sm text-gray-600 hover:underline">
+                                Cancelar y Volver
                             </a>
                             <x-primary-button>
-                                {{ __('Guardar Restaurante y Dueño') }}
+                                {{ __('Actualizar Restaurante') }}
                             </x-primary-button>
                         </div>
                     </form>

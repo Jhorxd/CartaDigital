@@ -18,4 +18,9 @@ class Tenant extends Model
         'schedule',
         'is_active',
     ];
+
+    public function owner()
+    {
+        return $this->hasOne(User::class)->whereNull('tenant_id', false); // Users with this tenant_id
+    }
 }
