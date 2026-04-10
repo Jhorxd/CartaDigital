@@ -10,19 +10,19 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index($subdomain)
     {
         $products = Product::with('category')->orderBy('order_position')->get();
         return view('tenant.products.index', compact('products'));
     }
 
-    public function create()
+    public function create($subdomain)
     {
         $categories = Category::orderBy('order_position')->get();
         return view('tenant.products.create', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $subdomain)
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
@@ -45,13 +45,13 @@ class ProductController extends Controller
             ->with('status', 'Producto creado correctamente.');
     }
 
-    public function edit(Product $product)
+    public function edit($subdomain, Product $product)
     {
         $categories = Category::orderBy('order_position')->get();
         return view('tenant.products.edit', compact('product', 'categories'));
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $subdomain, Product $product)
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
@@ -80,7 +80,7 @@ class ProductController extends Controller
             ->with('status', 'Producto actualizado correctamente.');
     }
 
-    public function destroy(Product $product)
+    public function destroy($subdomain, Product $product)
     {
         if ($product->image && str_contains($product->image, '/storage/')) {
             $oldPath = str_replace('/storage/', 'public/', $product->image);

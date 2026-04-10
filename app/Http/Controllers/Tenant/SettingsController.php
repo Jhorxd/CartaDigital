@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
-    public function edit()
+    public function edit($subdomain)
     {
         $tenant = request()->get('tenant');
         return view('tenant.settings.edit', compact('tenant'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $subdomain)
     {
         $tenant = request()->get('tenant');
 

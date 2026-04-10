@@ -16,7 +16,12 @@ class TenantController extends Controller
     public function index()
     {
         $tenants = Tenant::with('owner')->latest()->get();
-        return view('dashboard', compact('tenants'));
+        $stats = [
+            'total' => $tenants->count(),
+            'active' => $tenants->where('is_active', true)->count(),
+            'inactive' => $tenants->where('is_active', false)->count(),
+        ];
+        return view('dashboard', compact('tenants', 'stats'));
     }
 
     /**

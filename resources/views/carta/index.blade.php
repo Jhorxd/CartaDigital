@@ -94,27 +94,34 @@
     <nav class="sticky top-0 z-40 glass shadow-sm px-6 py-2 overflow-x-auto hide-scrollbar">
         <div class="flex gap-6 items-center">
             @foreach($categories as $category)
-            <a href="#cat-{{ $category->id }}" 
+            <button @click="activeCategory = '{{ $category->id }}'" 
                class="whitespace-nowrap py-2 text-sm font-semibold transition-all border-b-2 border-transparent hover:border-primary hover:text-primary active:scale-95"
-               :class="activeCategory == '{{ $category->id }}' ? 'border-primary text-primary scale-105' : 'text-slate-500 dark:text-slate-400'">
+               :class="activeCategory == '{{ $category->id }}' ? 'border-primary text-primary scale-105 font-bold' : 'text-slate-500 dark:text-slate-400'">
                 {{ $category->name }}
-            </a>
+            </button>
             @endforeach
         </div>
     </nav>
 
     <!-- Menu Content -->
-    <main class="p-6 space-y-12 pb-32">
+    <main class="p-6 space-y-8 pb-32">
         @foreach($categories as $category)
-        <section id="cat-{{ $category->id }}" class="scroll-mt-24 space-y-6">
+        <section x-cloak x-show="activeCategory == '{{ $category->id }}'" 
+                 x-transition:enter="transition ease-out duration-300 transform"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="space-y-6">
+            
             <div class="flex items-center gap-3">
                 <div class="w-1 h-8 gradient-bg rounded-full"></div>
                 <h2 class="text-2xl font-bold tracking-tight">{{ $category->name }}</h2>
             </div>
-
+            
+            <!-- Products Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach($category->products as $product)
-                <div class="product-card flex bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <div class="product-card flex bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-800">
+                    <!-- Product Image -->
                     <div class="w-28 sm:w-36 h-auto shrink-0 relative overflow-hidden group">
                         @if($product->image)
                             <img src="{{ $product->image }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
@@ -128,6 +135,7 @@
                         @endif
                     </div>
                     
+                    <!-- Product Info -->
                     <div class="flex-1 p-4 flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-lg leading-tight">{{ $product->name }}</h3>
@@ -155,6 +163,12 @@
                 </div>
                 @endforeach
             </div>
+            
+            @if($category->products->isEmpty())
+                <div class="text-center py-20 opacity-30">
+                    <p class="font-bold">No hay productos en esta categoría.</p>
+                </div>
+            @endif
         </section>
         @endforeach
     </main>
