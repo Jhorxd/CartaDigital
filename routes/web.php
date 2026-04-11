@@ -5,7 +5,10 @@ use App\Http\Controllers\CartaController;
 use App\Http\Controllers\Admin\TenantController;
 use Illuminate\Support\Facades\Route;
 
-$domain = env('APP_DOMAIN', 'localhost');
+$host = request()->getHost();
+$parts = explode('.', $host);
+// Si tiene subdominio (ej: elorigen.micartadig.com), el dominio base son los últimos dos segmentos
+$domain = (count($parts) >= 3) ? ($parts[$count-2] . '.' . $parts[$count-1]) : env('APP_DOMAIN', 'localhost');
 
 // 1. Rutas de Subdominio (Carta Pública y Admin del Tenant)
 Route::domain('{tenant}.' . $domain)->group(function () {
