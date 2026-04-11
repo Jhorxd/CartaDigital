@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('login.admin');
             }
             // Si es subdominio, mandamos al login normal del restaurante
-            return route('login');
+            return route('login', ['tenant' => $parts[0]]);
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
