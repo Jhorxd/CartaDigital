@@ -16,6 +16,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        $isTenant = app()->has('tenant_id');
+        $isSecretRoute = request()->is('acceso-total-151418*');
+
+        // Bloqueo de seguridad: No permitir el login equivocado en el dominio equivocado
+        if ($isTenant && $isSecretRoute) abort(404);
+        if (!$isTenant && !$isSecretRoute) abort(404);
+
         return view('auth.login');
     }
 
@@ -28,11 +35,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Redirección inteligente post-login
         if (app()->has('tenant_id')) {
-            return redirect()->intended(route('tenant.admin.dashboard', absolute: false));
+            // El restaurante va a /admin/dashboard
+            return redirect()->intended(route('tenant.admin.dashboard'));
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // El Super Admin va a /dashboard
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
