@@ -18,23 +18,26 @@ class IdentifyTenant
     public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
-        $parts = explode('.', $host);
+        $domain = env('APP_DOMAIN', 'localhost');
 
-
-        // Si hay al menos un subdominio y no es www (>= 3 para dominios como domain.com)
-        if (count($parts) >= 3 && $parts[0] !== 'www') {
-            $subdomain = $parts[0];
+        // Si el host no es exactamente el dominio principal (ignora www)
+        if ($host !== $domain && $host !== 'www.' . $domain) {
             
-            $tenant = Tenant::where('subdomain', $subdomain)->where('is_active', true)->first();
-
-            if ($tenant) {
-                app()->instance('tenant_id', $tenant->id);
-                $request->attributes->add(['tenant' => $tenant]);
+            // Verificamos si el host termina en .dominio.com para extraer el subdominio
+            if (str_ends_with($host, '.' . $domain)) {
+                $subdomain = str_replace('.' . $domain, '', $host);
                 
-                // Set default parameter for route() generation
-                \Illuminate\Support\Facades\URL::defaults(['tenant' => $subdomain]);
-            } else {
-                abort(404, 'Sitio web inactivo o no existe.');
+                $tenant = Tenant::where('subdomain', $subdomain)->where('is_active', true)->first();
+
+                if ($tenant) {
+                    app()->instance('tenant_id', $tenant->id);
+                    $request->attributes->add(['tenant' => $tenant]);
+                    
+                    // Set default parameter for route() generation
+                    \Illuminate\Support\Facades\URL::defaults(['tenant' => $subdomain]);
+                } else {
+                    abort(404, 'Sitio web inactivo o no existe.');
+                }
             }
         }
 

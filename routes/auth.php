@@ -14,19 +14,19 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function () {
     $domain = env('APP_DOMAIN', 'localhost');
 
-    // Rutas para los subdominios (Clientes/Restaurantes)
-    // Se define primero para que tenga prioridad en subdominios
+    // 1. Rutas para Subdominios (Restaurantes)
     Route::domain('{tenant}.' . $domain)->group(function () {
         Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
         Route::post('login', [AuthenticatedSessionController::class, 'store']);
     });
 
-    // Rutas para el dominio principal (SuperAdmin Secreto)
+    // 2. Rutas para Dominio Base (SuperAdmin Secreto)
     Route::domain($domain)->group(function () {
         Route::get('acceso-total-151418', [AuthenticatedSessionController::class, 'create'])->name('login.admin');
         Route::post('acceso-total-151418', [AuthenticatedSessionController::class, 'store']);
     });
 
+    // 3. Rutas de recuperación de contraseña (disponibles en ambos por sencillez)
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
