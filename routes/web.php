@@ -36,10 +36,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Super Admin
+// Super Admin (Accesible solo si NO estamos en un subdominio)
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [TenantController::class, 'index'])->name('dashboard');
-    Route::resource('tenants', TenantController::class);
+    
+    // Filtro para bloquear acceso desde subdominios
+    Route::middleware(function ($request, $next) {
+        if (app()->has('tenant_id')) {
+            abort(404);
+        }
+        return $next($request);
+    })->group(function () {
+        Route::get('/dashboard', [TenantController::class, 'index'])->name('dashboard');
+        Route::resource('tenants', TenantController::class);
+    });
 });
 
 // Perfil de Usuario
