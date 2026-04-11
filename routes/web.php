@@ -37,22 +37,9 @@ Route::get('/', function () {
 });
 
 // Super Admin (Accesible solo si NO estamos en un subdominio)
-Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // Dashboard Principal
-    Route::get('/dashboard', [TenantController::class, 'index'])
-        ->middleware(function ($request, $next) {
-            if (app()->has('tenant_id')) abort(404);
-            return $next($request);
-        })
-        ->name('dashboard');
-
-    // Gestión de Inquilinos
-    Route::resource('tenants', TenantController::class)
-        ->middleware(function ($request, $next) {
-            if (app()->has('tenant_id')) abort(404);
-            return $next($request);
-        });
+Route::middleware(['auth', 'verified', 'block.tenant'])->group(function () {
+    Route::get('/dashboard', [TenantController::class, 'index'])->name('dashboard');
+    Route::resource('tenants', TenantController::class);
 });
 
 // Perfil de Usuario
