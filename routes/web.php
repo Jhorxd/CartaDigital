@@ -30,6 +30,9 @@ Route::get('/test-auth', function () {
         'is_authenticated' => auth()->check(),
         'user' => auth()->user(),
         'session_id' => session()->getId(),
+        'session_data' => session()->all(), // Ver qué hay guardado
+        'app_has_tenant_id' => app()->has('tenant_id'),
+        'tenant_id_value' => app()->has('tenant_id') ? app('tenant_id') : 'NOT SET',
         'app_domain' => env('APP_DOMAIN'),
         'request_host' => request()->getHost(),
     ];
