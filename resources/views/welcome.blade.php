@@ -245,10 +245,7 @@
                     @auth
                         <a href="{{ url('/dashboard') }}" class="btn btn-primary">Mi Panel</a>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-outline">Ingresar</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="btn btn-primary">Empezar Gratis</a>
-                        @endif
+                        <a href="https://wa.me/51936427929" target="_blank" class="btn btn-primary">Consultar por WhatsApp</a>
                     @endauth
                 @endif
             </div>
@@ -263,7 +260,7 @@
                 @auth
                     <a href="{{ url('/dashboard') }}" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">Ir al Panel de Control</a>
                 @else
-                    <a href="{{ route('register') }}" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">Crea tu Carta Ahora</a>
+                    <a href="https://wa.me/51936427929" target="_blank" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">Crea tu Carta por WhatsApp</a>
                 @endauth
             </div>
         </section>
