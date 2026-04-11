@@ -16,6 +16,7 @@ class Tenant extends Model
         'address',
         'whatsapp',
         'schedule',
+        'brand_color',
         'is_active',
     ];
 

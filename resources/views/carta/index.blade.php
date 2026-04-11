@@ -7,7 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+
+    {{-- Color de marca dinámico del tenant --}}
+    <style>
+        :root {
+            --color-primary: {{ $tenant->brand_color ?? '#f97316' }};
+        }
+    </style>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -15,7 +22,7 @@
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
                     colors: {
-                        primary: '#f97316', // Color naranja para botones y detalles
+                        primary: 'var(--color-primary)',
                     }
                 }
             }
@@ -30,7 +37,9 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .product-card:active { transform: scale(0.96); }
-        .gradient-bg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+        .gradient-bg { background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, black) 100%); }
+        .text-primary { color: var(--color-primary) !important; }
+        .border-primary { border-color: var(--color-primary) !important; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans selection:bg-primary selection:text-white" x-data="cartManager">
@@ -244,7 +253,20 @@
                             <span>Total</span>
                             <span class="text-primary">S/ <span x-text="totalPrice.toFixed(2)"></span></span>
                         </div>
-                        <button @click="sendToWhatsApp" class="w-full gradient-bg py-4 rounded-2xl text-white font-black shadow-xl shadow-orange-500/20 active:scale-95 transition flex items-center justify-center gap-3">
+
+                        {{-- Campo de número de mesa --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">🪑 Mesa / Nombre (opcional)</label>
+                            <input
+                                type="text"
+                                x-model="tableNumber"
+                                placeholder="Ej: Mesa 5, Para llevar, Juan..."
+                                class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition"
+                                style="--tw-ring-color: var(--color-primary)"
+                            >
+                        </div>
+
+                        <button @click="sendToWhatsApp" class="w-full gradient-bg py-4 rounded-2xl text-white font-black shadow-xl active:scale-95 transition flex items-center justify-center gap-3">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-4.821 4.73c-2.197 0-4.342-.58-6.225-1.685L4 18.22l1.83-5.35c-1.21-2.083-1.847-4.467-1.847-6.902 0-7.407 6.04-13.447 13.448-13.447 3.608 0 7.001 1.405 9.554 3.958 2.553 2.553 3.957 5.946 3.957 9.554 0 7.408-6.04 13.45-13.448 13.45m0-25.26C5.435.352.004 5.783.004 12.51c0 2.15.56 4.247 1.626 6.115L0 24l5.545-1.455a12.1 12.1 0 005.811 1.493c6.726 0 12.158-5.43 12.158-12.157 0-3.26-1.27-6.324-3.575-8.63C17.636 1.147 14.57.352 11.306.352z"/></svg>
                             Confirmar por WhatsApp
                         </button>
@@ -266,6 +288,7 @@
 
             Alpine.data('cartManager', () => ({
                 cart: [],
+                tableNumber: '',
                 activeCategory: '{{ $categories->first()->id ?? 0 }}',
                 openDrawer: false,
                 
@@ -298,12 +321,22 @@
                 },
                 
                 sendToWhatsApp() {
-                    let message = "*Nuevo Pedido - {{ $tenant->name }}*\n\n";
+                    if (this.cart.length === 0) return;
+
+                    let message = '';
+
+                    // Incluir mesa si fue proporcionada
+                    if (this.tableNumber.trim()) {
+                        message += `🪑 *${this.tableNumber.trim()}* | {{ $tenant->name }}\n\n`;
+                    } else {
+                        message += `*Nuevo Pedido - {{ $tenant->name }}*\n\n`;
+                    }
+
                     this.cart.forEach(item => {
                         message += `• ${item.quantity}x ${item.name} - S/ ${(item.price * item.quantity).toFixed(2)}\n`;
                     });
                     message += `\n*Total: S/ ${this.totalPrice.toFixed(2)}*`;
-                    
+
                     const url = `https://wa.me/{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;
                     window.open(url, '_blank');
                 }

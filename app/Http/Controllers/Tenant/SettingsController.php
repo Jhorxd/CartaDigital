@@ -23,6 +23,7 @@ class SettingsController extends Controller
             'address' => 'nullable|string|max:255',
             'whatsapp' => 'nullable|string|max:20',
             'schedule' => 'nullable|string|max:255',
+            'brand_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'logo' => 'nullable|image|max:1024',
         ]);
 
