@@ -30,12 +30,23 @@ Route::get('/test-auth', function () {
         'is_authenticated' => auth()->check(),
         'user' => auth()->user(),
         'session_id' => session()->getId(),
-        'session_data' => session()->all(), // Ver qué hay guardado
+        'session_data' => session()->all(),
         'app_has_tenant_id' => app()->has('tenant_id'),
         'tenant_id_value' => app()->has('tenant_id') ? app('tenant_id') : 'NOT SET',
         'app_domain' => env('APP_DOMAIN'),
         'request_host' => request()->getHost(),
     ];
+});
+
+Route::get('/force-login', function () {
+    $user = \App\Models\User::where('email', 'admin@micartadig.com')->first();
+    if (!$user) return 'Usuario admin@micartadig.com no encontrado en la DB.';
+    
+    auth()->login($user);
+    session()->put('debug_manual_login', true);
+    session()->save(); // Forzar guardado inmediato
+    
+    return redirect('/test-auth');
 });
 
 // 2. Rutas Globales / Dominio Base (Super Admin, Landing y Auth)
