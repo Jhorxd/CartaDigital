@@ -20,7 +20,7 @@
             'subdomain' => $t->subdomain,
             'is_active' => (bool)$t->is_active,
             'edit_url' => route('tenants.edit', $t),
-            'view_url' => 'http://' . $t->subdomain . '.localhost:8000',
+            'view_url' => str_replace('://', "://{$t->subdomain}.", config('app.url')),
             'delete_url' => route('tenants.destroy', $t),
         ])->toJson() }},
         get filteredTenants() {
@@ -115,7 +115,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium" x-text="tenant.email"></td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-slate-400 font-mono italic" x-text="tenant.subdomain + '.localhost'"></div>
+                                            <div class="text-sm text-slate-400 font-mono italic" x-text="new URL(tenant.view_url).host"></div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span :class="tenant.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'" 
