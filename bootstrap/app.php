@@ -21,17 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => \App\Http\Middleware\IdentifyTenant::class,
         ]);
 
-        // Redirección inteligente basada en el dominio base
+        // Redirección inteligente basada en el dominio
         $middleware->redirectTo(function (Illuminate\Http\Request $request) {
-            $host = $request->getHost();
-            $domain = env('APP_DOMAIN', 'localhost');
-
-            // Si es exactamente el dominio principal o www
-            if ($host === $domain || $host === 'www.' . $domain) {
+            $parts = explode('.', $request->getHost());
+            // Si es dominio principal, mandamos al login secreto
+            if (count($parts) < 3 || $parts[0] === 'www') {
                 return route('login.admin');
             }
-            
-            // Si estamos en un subdominio (.micartadig.com)
+            // Si es subdominio, mandamos al login normal del restaurante
             return route('login');
         });
     })

@@ -29,28 +29,25 @@ Route::domain('{tenant}.' . $domain)->group(function () {
 // Nota: La autenticación es global para evitar problemas con parámetros de ruta.
 // El middleware IdentifyTenant (global) se encarga de identificar al restaurante si existe.
 
-// 2. Rutas Globales / Dominio Base (Super Admin, Landing y Auth)
-Route::domain($domain)->group(function () {
-    Route::get('/', function () {
-        if (auth()->check()) {
-            return redirect()->route('dashboard');
-        }
-        return view('welcome');
-    });
-
-    // Super Admin (Solo accesible en micartadig.com)
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/dashboard', [TenantController::class, 'index'])->name('dashboard');
-        Route::resource('tenants', TenantController::class);
-    });
-
-    // Perfil de Usuario (Solo accesible en micartadig.com)
-    Route::middleware('auth')->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    });
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('welcome');
 });
 
-// Rutas de Autenticación Unificadas (Cargadas globalmente, pero controladas por dominio internamente)
+// Super Admin
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [TenantController::class, 'index'])->name('dashboard');
+    Route::resource('tenants', TenantController::class);
+});
+
+// Perfil de Usuario
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Rutas de Autenticación Unificadas (Login, Logout, etc.)
 require __DIR__.'/auth.php';
