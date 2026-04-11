@@ -25,6 +25,16 @@ Route::domain('{tenant}.' . $domain)->group(function () {
     });
 });
 
+Route::get('/test-auth', function () {
+    return [
+        'is_authenticated' => auth()->check(),
+        'user' => auth()->user(),
+        'session_id' => session()->getId(),
+        'app_domain' => env('APP_DOMAIN'),
+        'request_host' => request()->getHost(),
+    ];
+});
+
 // 2. Rutas Globales / Dominio Base (Super Admin, Landing y Auth)
 // Nota: La autenticación es global para evitar problemas con parámetros de ruta.
 // El middleware IdentifyTenant (global) se encarga de identificar al restaurante si existe.

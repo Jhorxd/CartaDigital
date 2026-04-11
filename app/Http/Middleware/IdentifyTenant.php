@@ -20,8 +20,10 @@ class IdentifyTenant
         $host = $request->getHost();
         $parts = explode('.', $host);
 
-        // Si hay al menos un subdominio y no es www
-        if (count($parts) >= 2 && $parts[0] !== 'www') {
+        \Log::info('IdentifyTenant: Checking host', ['host' => $host, 'parts' => $parts]);
+
+        // Si hay al menos un subdominio y no es www (>= 3 para dominios como domain.com)
+        if (count($parts) >= 3 && $parts[0] !== 'www') {
             $subdomain = $parts[0];
             
             $tenant = Tenant::where('subdomain', $subdomain)->where('is_active', true)->first();
@@ -31,8 +33,9 @@ class IdentifyTenant
                 $request->attributes->add(['tenant' => $tenant]);
                 
                 // Set default parameter for route() generation
-                \Illuminate\Support\Facades\URL::defaults(['tenant' => $subdomain]);
+                \Log::info('IdentifyTenant: Tenant identified', ['subdomain' => $subdomain, 'tenant_id' => $tenant->id]);
             } else {
+                \Log::warning('IdentifyTenant: Tenant not found', ['subdomain' => $subdomain]);
                 abort(404, 'Sitio web inactivo o no existe.');
             }
         }
