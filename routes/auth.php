@@ -12,34 +12,18 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-/*
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+    $domain = env('APP_DOMAIN', 'localhost');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
-*/
+    // Rutas para el dominio principal (SuperAdmin Secreto)
+    Route::domain($domain)->group(function () {
+        Route::get('acceso-total-151418', [AuthenticatedSessionController::class, 'create'])->name('login');
+        Route::post('acceso-total-151418', [AuthenticatedSessionController::class, 'store']);
+    });
 
-    // URL secreta para el SuperAdmin (funciona en cualquier lugar, pero la usarás en el dominio principal)
-    Route::get('acceso-total-151418', [AuthenticatedSessionController::class, 'create']);
-    Route::post('acceso-total-151418', [AuthenticatedSessionController::class, 'store']);
-
-    // URL normal de login (solo permitida para restaurantes/subdominios)
-    Route::get('login', function (Illuminate\Http\Request $request) {
-        $parts = explode('.', $request->getHost());
-        // Si estamos en el dominio principal (ej. micartadig.com sin subdominio) bloqueamos el acceso
-        if (count($parts) < 3 || $parts[0] === 'www') {
-            abort(404);
-        }
-        // Si estamos en un restaurante (ej. elorigen.micartadig.com) mostramos el login
-        return app()->call([AuthenticatedSessionController::class, 'create']);
-    })->name('login');
-
-    Route::post('login', function (Illuminate\Http\Request $request) {
-        $parts = explode('.', $request->getHost());
-        if (count($parts) < 3 || $parts[0] === 'www') {
-            abort(404);
-        }
-        return app()->call([AuthenticatedSessionController::class, 'store']);
+    // Rutas para los subdominios (Clientes/Restaurantes)
+    Route::domain('{tenant}.' . $domain)->group(function () {
+        Route::get('login', [AuthenticatedSessionController::class, 'create']);
+        Route::post('login', [AuthenticatedSessionController::class, 'store']);
     });
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
