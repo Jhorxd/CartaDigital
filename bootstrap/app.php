@@ -20,6 +20,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant' => \App\Http\Middleware\IdentifyTenant::class,
         ]);
+
+        // Redirección inteligente basada en el dominio
+        $middleware->redirectTo(function (Illuminate\Http\Request $request) {
+            $parts = explode('.', $request->getHost());
+            // Si es dominio principal, mandamos al login secreto
+            if (count($parts) < 3 || $parts[0] === 'www') {
+                return route('login.admin');
+            }
+            // Si es subdominio, mandamos al login normal del restaurante
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -14,16 +14,17 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function () {
     $domain = env('APP_DOMAIN', 'localhost');
 
-    // Rutas para el dominio principal (SuperAdmin Secreto)
-    Route::domain($domain)->group(function () {
-        Route::get('acceso-total-151418', [AuthenticatedSessionController::class, 'create'])->name('login');
-        Route::post('acceso-total-151418', [AuthenticatedSessionController::class, 'store']);
+    // Rutas para los subdominios (Clientes/Restaurantes)
+    // Se define primero para que tenga prioridad en subdominios
+    Route::domain('{tenant}.' . $domain)->group(function () {
+        Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+        Route::post('login', [AuthenticatedSessionController::class, 'store']);
     });
 
-    // Rutas para los subdominios (Clientes/Restaurantes)
-    Route::domain('{tenant}.' . $domain)->group(function () {
-        Route::get('login', [AuthenticatedSessionController::class, 'create']);
-        Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    // Rutas para el dominio principal (SuperAdmin Secreto)
+    Route::domain($domain)->group(function () {
+        Route::get('acceso-total-151418', [AuthenticatedSessionController::class, 'create'])->name('login.admin');
+        Route::post('acceso-total-151418', [AuthenticatedSessionController::class, 'store']);
     });
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
