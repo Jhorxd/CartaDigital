@@ -43,10 +43,25 @@ Route::get('/force-login', function () {
     if (!$user) return 'Usuario admin@micartadig.com no encontrado en la DB.';
     
     auth()->login($user);
-    session()->put('debug_manual_login', true);
-    session()->save(); // Forzar guardado inmediato
+    $check_immediate = auth()->check();
+    $user_id = auth()->id();
     
-    return redirect('/test-auth');
+    session()->put('debug_manual_login', true);
+    session()->save(); 
+    
+    \Log::info('ForceLogin: Step 1 executed', [
+        'check_immediate' => $check_immediate,
+        'user_id' => $user_id,
+        'session_id' => session()->getId()
+    ]);
+
+    return [
+        'message' => 'Login intentado. Mira los resultados abajo y luego ve a /test-auth',
+        'check_before_redirect' => $check_immediate,
+        'user_id' => $user_id,
+        'session_id' => session()->getId(),
+        'redirect_to' => url('/test-auth')
+    ];
 });
 
 // 2. Rutas Globales / Dominio Base (Super Admin, Landing y Auth)
