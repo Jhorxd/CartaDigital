@@ -37,8 +37,9 @@ class AuthenticatedSessionController extends Controller
 
         // Redirección inteligente post-login
         if (app()->has('tenant_id')) {
-            // El restaurante va a /admin/dashboard
-            return redirect()->intended(route('tenant.admin.dashboard'));
+            // Construimos la URL absoluta usando el host actual para evitar perder el subdominio
+            $adminUrl = request()->getScheme() . '://' . request()->getHost() . '/admin/dashboard';
+            return redirect()->intended($adminUrl);
         }
 
         // El Super Admin va a /dashboard
