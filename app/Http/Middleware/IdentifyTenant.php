@@ -21,8 +21,11 @@ class IdentifyTenant
         $parts = explode('.', $host);
 
 
-        // Si hay al menos un subdominio y no es www (>= 3 para dominios como domain.com)
-        if (count($parts) >= 3 && $parts[0] !== 'www') {
+        // Detectamos si es un subdominio (En localhost bastan 2 partes, en producción 3)
+        $isLocalhost = str_ends_with($host, 'localhost') || str_ends_with($host, '127.0.0.1');
+        $minParts = $isLocalhost ? 2 : 3;
+
+        if (count($parts) >= $minParts && $parts[0] !== 'www') {
             $subdomain = $parts[0];
             
             $tenant = Tenant::where('subdomain', $subdomain)->where('is_active', true)->first();

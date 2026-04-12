@@ -24,9 +24,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Redirección inteligente basada en el dominio
         $middleware->redirectTo(function (Illuminate\Http\Request $request) {
-            $parts = explode('.', $request->getHost());
+            $host = $request->getHost();
+            $parts = explode('.', $host);
+            $isLocalhost = str_ends_with($host, 'localhost') || str_ends_with($host, '127.0.0.1');
+            $minParts = $isLocalhost ? 2 : 3;
+
             // Si es dominio principal, mandamos al login secreto
-            if (count($parts) < 3 || $parts[0] === 'www') {
+            if (count($parts) < $minParts || $parts[0] === 'www') {
                 return route('login.admin');
             }
             // Si es subdominio, mandamos al login normal del restaurante

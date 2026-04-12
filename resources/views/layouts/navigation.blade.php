@@ -82,9 +82,24 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @if(app()->has('tenant_id'))
+                <x-responsive-nav-link :href="route('tenant.admin.dashboard')" :active="request()->routeIs('tenant.admin.dashboard')">
+                    {{ __('🏠 Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('tenant.admin.categories.index')" :active="request()->routeIs('tenant.admin.categories.*')">
+                    {{ __('📂 Categorías') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('tenant.admin.products.index')" :active="request()->routeIs('tenant.admin.products.*')">
+                    {{ __('📦 Productos') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('tenant.admin.settings.edit')" :active="request()->routeIs('tenant.admin.settings.*')">
+                    {{ __('⚙️ Mi Local') }}
+                </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard Admin') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
