@@ -36,6 +36,22 @@ return Application::configure(basePath: dirname(__DIR__))
             // Si es subdominio, mandamos al login normal del restaurante
             return route('login', ['tenant' => $parts[0]]);
         });
+
+        // Redirección para usuarios YA autenticados que intentan entrar a login
+        $middleware->redirectUsersTo(function (Illuminate\Http\Request $request) {
+            $host = $request->getHost();
+            $parts = explode('.', $host);
+            $isLocalhost = str_ends_with($host, 'localhost') || str_ends_with($host, '127.0.0.1');
+            $minParts = $isLocalhost ? 2 : 3;
+
+            // Si es dominio principal, mandamos al dashboard global (Super Admin)
+            if (count($parts) < $minParts || $parts[0] === 'www') {
+                return route('dashboard');
+            }
+            
+            // Si es un tenant (subdominio), mandamos a su panel de administración
+            return route('tenant.admin.dashboard');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
