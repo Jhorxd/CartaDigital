@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Carta Digital | Digitaliza tu restorán o cafetería</title>
+    <title>MiCartaDig | Digitaliza tu restorán o cafetería</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -237,8 +238,7 @@
     <nav>
         <div class="container nav-content">
             <a href="/" class="logo">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-                Carta Digital
+                <span style="color: var(--primary); font-style: italic;">Mi</span>CartaDig
             </a>
             <div class="nav-links">
                 @if (Route::has('login'))
@@ -291,7 +291,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; {{ date('Y') }} Carta Digital. Todos los derechos reservados.</p>
+            <p>&copy; {{ date('Y') }} MiCartaDig. Todos los derechos reservados.</p>
             <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.6;">Hecho para digitalizar la gastronomía.</p>
         </div>
     </footer>
