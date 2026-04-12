@@ -7,6 +7,9 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -47,8 +50,17 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $validated['image'] = Storage::url($path);
+            $manager = new ImageManager(new Driver());
+            $imageFile = $request->file('image');
+            $filename = Str::random(40) . '.webp';
+            
+            // Procesar imagen: redimensionar a 800px de ancho y convertir a WebP
+            $image = $manager->read($imageFile);
+            $image->scale(width: 800);
+            $encoded = $image->toWebp(75);
+            
+            Storage::disk('public')->put('products/' . $filename, $encoded);
+            $validated['image'] = Storage::url('products/' . $filename);
         }
 
         Product::create($validated);
@@ -81,8 +93,18 @@ class ProductController extends Controller
                 $oldPath = str_replace('/storage/', 'public/', $product->image);
                 Storage::delete($oldPath);
             }
-            $path = $request->file('image')->store('products', 'public');
-            $validated['image'] = Storage::url($path);
+
+            $manager = new ImageManager(new Driver());
+            $imageFile = $request->file('image');
+            $filename = Str::random(40) . '.webp';
+            
+            // Procesar imagen: redimensionar a 800px de ancho y convertir a WebP
+            $image = $manager->read($imageFile);
+            $image->scale(width: 800);
+            $encoded = $image->toWebp(75);
+            
+            Storage::disk('public')->put('products/' . $filename, $encoded);
+            $validated['image'] = Storage::url('products/' . $filename);
         }
 
         $validated['is_active'] = $request->has('is_active');

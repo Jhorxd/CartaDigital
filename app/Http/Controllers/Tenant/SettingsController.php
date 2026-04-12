@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
@@ -32,8 +35,18 @@ class SettingsController extends Controller
                 $oldPath = str_replace('/storage/', 'public/', $tenant->logo);
                 Storage::delete($oldPath);
             }
-            $path = $request->file('logo')->store('logos', 'public');
-            $validated['logo'] = Storage::url($path);
+            
+            $manager = new ImageManager(new Driver());
+            $imageFile = $request->file('logo');
+            $filename = Str::random(40) . '.webp';
+            
+            // Procesar logo: redimensionar a 400px de ancho (logos suelen ser pequeños) y convertir a WebP
+            $image = $manager->read($imageFile);
+            $image->scale(width: 400);
+            $encoded = $image->toWebp(80);
+            
+            Storage::disk('public')->put('logos/' . $filename, $encoded);
+            $validated['logo'] = Storage::url('logos/' . $filename);
         }
 
         $tenant->update($validated);
