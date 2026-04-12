@@ -5,14 +5,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ (isset($tenant) ? $tenant->name : (request()->get('tenant') ? request()->get('tenant')->name : config('app.name'))) }} | {{ config('app.name') }}</title>
+        <link rel="icon" type="image/png" href="{{ (isset($tenant) && $tenant->logo) ? $tenant->logo : (request()->get('tenant') && request()->get('tenant')->logo ? request()->get('tenant')->logo : asset('favicon.png')) }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        {{-- Color de marca dinámico --}}
+        @php
+            $currentTenant = isset($tenant) ? $tenant : request()->get('tenant');
+        @endphp
+        <style>
+            :root {
+                --color-primary: {{ $currentTenant->brand_color ?? '#f97316' }};
+            }
+        </style>
+
         <!-- Scripts -->
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: 'var(--color-primary)',
+                        }
+                    }
+                }
+            }
+        </script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased">
