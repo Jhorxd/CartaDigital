@@ -111,12 +111,32 @@
         </div>
     </div>
 
+    <!-- Global Search Bar -->
+    <div class="px-6 mb-8">
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input 
+                type="text" 
+                x-model="search"
+                placeholder="Busca tu plato favorito..." 
+                class="w-full bg-white dark:bg-slate-900 border-2 border-transparent focus:border-primary/20 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold shadow-xl shadow-slate-200/50 dark:shadow-none focus:outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+            >
+            <template x-if="search.length > 0">
+                <button @click="search = ''" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-primary transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </template>
+        </div>
+    </div>
+
     <!-- Recommendations / Featured (Dynamic) -->
     @php
         $featured = $categories->flatMap->products->where('is_popular', true)->take(6);
     @endphp
     @if($featured->isNotEmpty())
-    <div class="mb-10 animate-[fade-in-up_0.8s_ease-out]">
+    <div class="mb-10 animate-[fade-in-up_0.8s_ease-out]" x-show="search === ''">
         <div class="px-8 flex justify-between items-end mb-6">
             <div>
                 <span class="text-primary text-[10px] font-black uppercase tracking-[0.2em]">Más vendidos</span>
@@ -155,8 +175,13 @@
     </div>
     @endif
 
+    <!-- Search Results Helper / Category Overrides -->
+    <div x-show="search.length > 0" class="px-8 mb-4">
+        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">Resultados de búsqueda</h3>
+    </div>
+
     <!-- Sticky Tabs Navigation -->
-    <nav class="sticky top-0 z-40 glass shadow-2xl py-4 overflow-x-auto hide-scrollbar mb-4">
+    <nav class="sticky top-0 z-40 glass shadow-2xl py-4 overflow-x-auto hide-scrollbar mb-4" x-show="search === ''">
         <div class="flex gap-8 px-8 pr-16 items-center">
             @foreach($categories as $category)
             <button @click="activeCategory = '{{ $category->id }}'" 
@@ -171,14 +196,14 @@
     <!-- Menu Content -->
     <main class="p-6 sm:p-8 space-y-12 pb-32">
         @foreach($categories as $category)
-        <section x-cloak x-show="activeCategory == '{{ $category->id }}'" 
+        <section x-cloak x-show="search === '' ? (activeCategory == '{{ $category->id }}') : categoryHasResults('{{ $category->id }}')" 
                  x-transition:enter="transition ease-out duration-500"
                  x-transition:enter-start="opacity-0 translate-y-10 scale-95"
                  x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                  id="cat-{{ $category->id }}"
                  class="space-y-8">
             
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4" x-show="search === '' || categoryHasResults('{{ $category->id }}')">
                 <div class="h-10 w-2.5 rounded-full gradient-bg shadow-lg shadow-primary"></div>
                 <div>
                     <h2 class="text-3xl font-black tracking-tight leading-none">{{ $category->name }}</h2>
@@ -189,13 +214,18 @@
             <!-- Products Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($category->products as $product)
-                <div @click="addToCart({ 
+                <div x-show="search === '' || '{{ strtolower($product->name) }}'.includes(search.toLowerCase())"
+                     @if($product->is_active)
+                     @click="addToCart({ 
                                     id: {{ $product->id }}, 
                                     name: '{{ $product->name }}', 
                                     price: {{ $product->price }}, 
                                     image: '{{ $product->image ?? '' }}' 
                                 })"
-                     class="product-card flex bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none border border-white dark:border-slate-800 p-3 group active:scale-95 transition-all">
+                     @endif
+                     class="product-card flex bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none border border-white dark:border-slate-800 p-3 group transition-all"
+                     :class="search === '' || '{{ strtolower($product->name) }}'.includes(search.toLowerCase()) ? '{{ $product->is_active ? 'active:scale-95' : 'opacity-70 grayscale-[0.5]' }}' : 'hidden'">
+                    
                     <!-- Product Image -->
                     <div class="w-28 sm:w-36 h-28 sm:h-36 shrink-0 relative overflow-hidden rounded-[2rem] shadow-lg">
                         @if($product->image)
@@ -205,7 +235,12 @@
                                 <svg class="w-12 h-12 text-primary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             </div>
                         @endif
-                        @if($product->is_popular)
+
+                        @if(!$product->is_active)
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center p-2 text-center">
+                                <span class="text-white font-black text-[10px] uppercase tracking-widest leading-tight">No disponible</span>
+                            </div>
+                        @elseif($product->is_popular)
                             <div class="absolute top-3 left-3 bg-yellow-400 text-black text-[9px] font-black px-2.5 py-1 rounded-full shadow-2xl flex items-center gap-1">
                                 <span class="pulse-soft">⭐</span> 
                                 POPULAR
@@ -226,9 +261,16 @@
                             <div class="text-2xl font-black text-primary tracking-tighter">
                                 <span class="text-sm font-bold opacity-60">S/</span>{{ number_format($product->price, 2) }}
                             </div>
-                            <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-primary group-hover:bg-primary group-hover:!text-white transition-all shadow-sm group-hover:scale-110 active:scale-90">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                            </div>
+                            
+                            @if($product->is_active)
+                                <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-primary group-hover:bg-primary group-hover:!text-white transition-all shadow-sm group-hover:scale-110 active:scale-90">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                                </div>
+                            @else
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-600 cursor-not-allowed">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -388,6 +430,16 @@
                 tableNumber: '',
                 activeCategory: '{{ $categories->first()->id ?? 0 }}',
                 openDrawer: false,
+                search: '',
+                
+                // All products to help with search without full re-render
+                allProducts: @json($categories->map(fn($cat) => ['id' => $cat->id, 'products' => $cat->products->map(fn($p) => strtolower($p->name))])),
+
+                categoryHasResults(catId) {
+                    if (this.search === '') return true;
+                    const cat = this.allProducts.find(c => c.id == catId);
+                    return cat ? cat.products.some(p => p.includes(this.search.toLowerCase())) : false;
+                },
                 
                 addToCart(product) {
                     const existing = this.cart.find(i => i.id === product.id);

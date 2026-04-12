@@ -12,7 +12,7 @@ class CartaController extends Controller
     {
         $tenant = request()->get('tenant');
         $categories = Category::with(['products' => function($q) {
-            $q->where('is_active', true)->orderBy('order_position');
+            $q->orderBy('order_position');
         }])->orderBy('order_position')->get();
 
         return view('carta.index', compact('tenant', 'categories'));
