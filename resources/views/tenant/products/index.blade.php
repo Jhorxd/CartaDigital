@@ -19,6 +19,40 @@
                 </div>
             @endif
 
+            <div class="mb-6 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form action="{{ route('tenant.admin.products.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <x-input-label for="search" :value="__('Buscar por nombre')" />
+                            <x-text-input id="search" name="search" type="text" class="mt-1 block w-full" :value="request('search')" placeholder="Nombre del producto..." />
+                        </div>
+                        
+                        <div class="w-full md:w-64">
+                            <x-input-label for="category_id" :value="__('Filtrar por Categoría')" />
+                            <select id="category_id" name="category_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">Todas las categorías</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded-md transition">
+                                Filtrar
+                            </button>
+                            @if(request()->anyFilled(['search', 'category_id']))
+                                <a href="{{ route('tenant.admin.products.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded-md transition text-center">
+                                    Limpiar
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 overflow-x-auto">
                     

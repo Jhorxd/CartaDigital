@@ -10,10 +10,22 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index($subdomain)
+    public function index(Request $request, $subdomain)
     {
-        $products = Product::with('category')->orderBy('order_position')->get();
-        return view('tenant.products.index', compact('products'));
+        $query = Product::with('category');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $products = $query->orderBy('order_position')->get();
+        $categories = Category::orderBy('order_position')->get();
+
+        return view('tenant.products.index', compact('products', 'categories'));
     }
 
     public function create($subdomain)

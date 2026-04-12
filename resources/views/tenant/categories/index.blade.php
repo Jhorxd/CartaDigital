@@ -19,6 +19,28 @@
                 </div>
             @endif
 
+            <div class="mb-6 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form action="{{ route('tenant.admin.categories.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1">
+                            <x-input-label for="search" :value="__('Buscar por nombre')" />
+                            <x-text-input id="search" name="search" type="text" class="mt-1 block w-full" :value="request('search')" placeholder="Nombre de la categoría..." />
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded-md transition">
+                                Filtrar
+                            </button>
+                            @if(request()->filled('search'))
+                                <a href="{{ route('tenant.admin.categories.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded-md transition text-center">
+                                    Limpiar
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 overflow-x-auto">
                     

@@ -8,9 +8,15 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index($subdomain)
+    public function index(Request $request, $subdomain)
     {
-        $categories = Category::orderBy('order_position')->get();
+        $query = Category::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $categories = $query->orderBy('order_position')->get();
         return view('tenant.categories.index', compact('categories'));
     }
 
