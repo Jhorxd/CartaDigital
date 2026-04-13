@@ -63,7 +63,7 @@
                                             <img src="{{ $product->image }}" class="w-32 h-32 object-cover rounded-lg border shadow-sm">
                                         </div>
                                     @endif
-                                    <input id="image" name="image" type="file" accept="image/*" capture="environment" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                    <input id="image" name="image" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
                                     <x-input-error class="mt-2" :messages="$errors->get('image')" />
                                 </div>
 
