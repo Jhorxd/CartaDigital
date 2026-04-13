@@ -42,11 +42,13 @@ class TenantController extends Controller
             'subdomain' => 'required|string|max:255|unique:tenants,subdomain',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'business_type' => 'required|string|in:restaurant,boutique',
         ]);
         
         $tenant = Tenant::create([
             'name' => $request->name,
             'subdomain' => $request->subdomain,
+            'business_type' => $request->business_type,
             'is_active' => true,
         ]);
 
@@ -82,11 +84,13 @@ class TenantController extends Controller
             'subdomain' => 'required|string|max:255|unique:tenants,subdomain,' . $tenant->id,
             'email' => 'required|email|unique:users,email,' . ($owner->id ?? 0),
             'password' => 'nullable|string|min:8',
+            'business_type' => 'required|string|in:restaurant,boutique',
         ]);
         
         $tenant->update([
             'name' => $request->name,
             'subdomain' => $request->subdomain,
+            'business_type' => $request->business_type,
         ]);
 
         if ($owner) {

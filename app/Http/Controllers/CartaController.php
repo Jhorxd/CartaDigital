@@ -15,6 +15,10 @@ class CartaController extends Controller
             $q->orderBy('order_position');
         }])->orderBy('order_position')->get();
 
-        return view('carta.index', compact('tenant', 'categories'));
+        if ($tenant->business_type === 'boutique') {
+            return view('carta.boutique.index', compact('tenant', 'categories'));
+        }
+
+        return view('carta.restaurant.index', compact('tenant', 'categories'));
     }
 }

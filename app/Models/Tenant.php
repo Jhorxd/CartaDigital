@@ -18,6 +18,7 @@ class Tenant extends Model
         'schedule',
         'brand_color',
         'is_active',
+        'business_type',
     ];
 
     public function owner()

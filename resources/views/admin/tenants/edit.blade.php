@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Editar Restaurante') }}: {{ $tenant->name }}
+            {{ __('Editar Negocio') }}: {{ $tenant->name }}
         </h2>
     </x-slot>
 
@@ -16,7 +16,7 @@
                         
                         <!-- Sección Restaurante -->
                         <div class="border-b pb-4">
-                            <h3 class="text-lg font-bold text-gray-700 mb-4">🏠 Información del Local</h3>
+                            <h3 class="text-lg font-bold text-gray-700 mb-4">🏠 Información del Local / Negocio</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="name" :value="__('Nombre del Negocio')" />
@@ -34,6 +34,14 @@
                                     </div>
                                     <x-input-error class="mt-2" :messages="$errors->get('subdomain')" />
                                 </div>
+                            </div>
+                            <div class="mt-6">
+                                <x-input-label for="business_type" :value="__('Tipo de Negocio')" />
+                                <select id="business_type" name="business_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                    <option value="restaurant" {{ old('business_type', $tenant->business_type) == 'restaurant' ? 'selected' : '' }}>Restaurante / Comida</option>
+                                    <option value="boutique" {{ old('business_type', $tenant->business_type) == 'boutique' ? 'selected' : '' }}>Boutique / Perfumería / Ropa</option>
+                                </select>
+                                <x-input-error class="mt-2" :messages="$errors->get('business_type')" />
                             </div>
                         </div>
 
@@ -65,7 +73,7 @@
                                 Cancelar y Volver
                             </a>
                             <x-primary-button>
-                                {{ __('Actualizar Restaurante') }}
+                                {{ __('Actualizar Negocio') }}
                             </x-primary-button>
                         </div>
                     </form>
