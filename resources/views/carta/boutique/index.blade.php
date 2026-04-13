@@ -134,7 +134,7 @@
                                         <div class="absolute inset-0 bg-gradient-to-t from-gray-100 dark:from-[#121212] to-transparent opacity-80 z-0"></div>
                                         
                                         @if($product->image)
-                                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl">
+                                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="absolute inset-0 w-full h-full object-contain p-4 relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl bg-white dark:bg-white/5 rounded-t-sm">
                                         @else
                                             <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-brand/20 group-hover:text-brand/40 transition-colors duration-500">
                                                 <svg class="w-24 h-24 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 22.5A3 3 0 0 0 22.5 19.5v-3.375c0-.986-.4-1.92-1.11-2.61l-5.64-5.55a1.5 1.5 0 0 0-1.5-.42L12 8A4.5 4.5 0 0 0 7.5 19.5v3H19.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m15.5 8-.5-1.5a1.5 1.5 0 0 0-.42-1.5L9 2.25A3 3 0 0 0 6 5.25v3.375c0 .986.4 1.92 1.11 2.61l5.64 5.55a1.5 1.5 0 0 0 1.5.42L16.5 16A4.5 4.5 0 0 0 21 4.5v-3H9" /></svg>
