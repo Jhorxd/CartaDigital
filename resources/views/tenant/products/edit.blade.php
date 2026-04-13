@@ -56,14 +56,27 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('description')" />
                                 </div>
 
-                                <div>
+                                <div x-data="{ fileName: '' }">
                                     <x-input-label for="image" :value="__('Cambiar Imagen')" />
                                     @if($product->image)
                                         <div class="mt-2 mb-2">
                                             <img src="{{ $product->image }}" class="w-32 h-32 object-cover rounded-lg border shadow-sm">
                                         </div>
                                     @endif
-                                    <input id="image" name="image" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                    
+                                    <div class="flex flex-col sm:flex-row gap-2 mt-2">
+                                        <button type="button" onclick="let i = document.getElementById('image'); i.setAttribute('capture', 'environment'); i.click();" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
+                                            📸 Usar Cámara
+                                        </button>
+                                        <button type="button" onclick="let i = document.getElementById('image'); i.removeAttribute('capture'); i.click();" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
+                                            📁 Galería / Archivo
+                                        </button>
+                                    </div>
+                                    
+                                    <input id="image" name="image" type="file" accept="image/*" class="hidden" @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''" />
+                                    
+                                    <p x-cloak x-show="fileName" class="mt-2 text-sm text-green-600 font-semibold" x-text="'Nuevo archivo: ' + fileName"></p>
+                                    
                                     <x-input-error class="mt-2" :messages="$errors->get('image')" />
                                 </div>
 
