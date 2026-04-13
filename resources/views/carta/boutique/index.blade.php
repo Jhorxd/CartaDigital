@@ -41,7 +41,7 @@
         .light .luxury-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 20px rgba(205, 162, 94, 0.2); }
     </style>
 </head>
-<body class="antialiased min-h-screen relative font-sans transition-colors duration-500 selection:bg-brand selection:text-white bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-white pb-24">
+<body class="antialiased min-h-screen relative font-sans transition-colors duration-500 selection:bg-brand selection:text-white bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-white pb-24" x-data="cartManager">
 
     <!-- Theme Switcher -->
     <div class="fixed top-6 right-6 z-50">
@@ -156,10 +156,10 @@
                                         <div class="mt-auto w-full pt-6 border-t border-gray-100 dark:border-white/5 flex flex-col items-center gap-4">
                                             <span class="text-xl font-bold tracking-widest text-gray-900 dark:text-white">S/ {{ number_format($product->price, 2) }}</span>
                                             
-                                            <a href="https://wa.me/51{{ $tenant->whatsapp ?? '' }}?text={{ urlencode('Hola, me interesa el producto: '.$product->name) }}" target="_blank"
+                                            <button @click.prevent="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->price }}, image: '{{ Storage::url($product->image) }}' })"
                                                class="w-full py-3 px-6 bg-transparent border border-brand text-brand hover:bg-brand hover:text-white dark:hover:text-black transition-all duration-300 text-[10px] uppercase tracking-[0.2em] font-bold text-center rounded-sm">
-                                                Consultar / Comprar
-                                            </a>
+                                                Añadir al Carrito
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -176,6 +176,92 @@
         @endif
     </main>
 
+    <!-- Floating Cart Icon -->
+    <div x-cloak x-show="totalItems > 0" 
+         x-transition:enter="transition ease-out duration-500 transform"
+         x-transition:enter-start="translate-y-24 opacity-0"
+         x-transition:enter-end="translate-y-0 opacity-100"
+         class="fixed bottom-8 right-6 z-[60]">
+        
+        <button @click="openDrawer = true" class="relative w-16 h-16 rounded-full bg-brand text-black shadow-[0_0_20px_rgba(205,162,94,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <div class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-white text-black text-[10px] font-bold flex items-center justify-center border border-black/10" x-text="totalItems"></div>
+        </button>
+    </div>
+
+    <!-- Elegant Cart Drawer Overlay -->
+    <div x-cloak x-show="openDrawer" class="fixed inset-0 z-[70] flex justify-end" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div x-show="openDrawer" x-transition.opacity class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="openDrawer = false"></div>
+
+        <div x-show="openDrawer" 
+             x-transition:enter="transform transition ease-in-out duration-500"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transform transition ease-in-out duration-500"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="relative w-full max-w-md h-full bg-white dark:bg-[#0a0a0a] shadow-2xl flex flex-col border-l border-gray-200 dark:border-white/5">
+            
+            <div class="px-6 h-24 flex items-center justify-between border-b border-gray-100 dark:border-white/5 shrink-0 bg-gray-50 dark:bg-black/40">
+                <div>
+                    <h2 class="font-serif text-xl tracking-widest text-gray-900 dark:text-white">Cesta de Compra</h2>
+                </div>
+                <button @click="openDrawer = false" class="w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-[#121212] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-brand transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-6 py-8 space-y-6 hide-scrollbar">
+                <template x-for="item in cart" :key="item.id">
+                    <div class="flex items-center gap-4 bg-gray-50 dark:bg-[#121212] p-3 rounded-sm border border-gray-100 dark:border-white/5">
+                        <div class="w-16 h-16 shrink-0 bg-white dark:bg-black overflow-hidden flex items-center justify-center p-1 border border-gray-100 dark:border-white/5">
+                            <template x-if="item.image">
+                                <img :src="item.image" class="w-full h-full object-cover">
+                            </template>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-sans text-sm font-semibold tracking-wide text-gray-900 dark:text-white truncate" x-text="item.name"></h4>
+                            <p class="text-brand font-medium text-xs mt-1 tracking-widest">S/ <span x-text="(item.price * item.quantity).toFixed(2)"></span></p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button @click="removeFromCart(item.id)" class="w-7 h-7 flex items-center justify-center rounded-sm bg-gray-200 dark:bg-black text-gray-600 dark:text-gray-400 hover:text-brand transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            </button>
+                            <span class="text-xs font-semibold w-4 text-center text-gray-900 dark:text-white" x-text="item.quantity"></span>
+                            <button @click="addToCart(item)" class="w-7 h-7 flex items-center justify-center rounded-sm bg-gray-200 dark:bg-black text-gray-600 dark:text-gray-400 hover:text-brand transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+                
+                <template x-if="cart.length === 0">
+                    <div class="text-center py-16 opacity-40">
+                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <p class="text-[10px] tracking-widest uppercase">Cesta Vacia</p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="p-6 bg-white dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-white/5 space-y-6">
+                <div class="flex justify-between items-end">
+                    <p class="text-[10px] font-semibold uppercase text-gray-400 tracking-widest">Total Estimado</p>
+                    <p class="text-xl font-serif text-gray-900 dark:text-white">S/ <span x-text="totalPrice.toFixed(2)"></span></p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Nombre / Dirección</label>
+                    <input type="text" x-model="clientDetails" placeholder="Ej: Juan Perez - Envío a Miraflores..."
+                        class="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-sm px-4 py-3 text-xs font-semibold focus:border-brand focus:ring-0 transition-all text-gray-900 dark:text-white placeholder:text-gray-400">
+                </div>
+
+                <button @click="sendToWhatsApp" class="w-full py-4 bg-brand text-black hover:bg-white transition-all duration-300 text-[11px] uppercase tracking-[0.2em] font-bold text-center rounded-sm shadow-[0_0_20px_rgba(205,162,94,0.2)]">
+                    Solicitar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Exquisite Footer -->
     <footer class="border-t border-gray-200 dark:border-white/10 mt-12 bg-gray-50 dark:bg-black py-12">
         <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center">
@@ -189,10 +275,63 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('themeManager', () => ({
-                darkMode: localStorage.getItem('darkMode') ? localStorage.getItem('darkMode') === 'true' : true, // Por defecto Dark Mode en Boutiques
+                darkMode: localStorage.getItem('darkMode') ? localStorage.getItem('darkMode') === 'true' : true,
                 toggleTheme() {
                     this.darkMode = !this.darkMode;
                     localStorage.setItem('darkMode', this.darkMode);
+                }
+            }));
+
+            Alpine.data('cartManager', () => ({
+                cart: [],
+                clientDetails: '',
+                openDrawer: false,
+                
+                addToCart(product) {
+                    const existing = this.cart.find(i => i.id === product.id);
+                    if (existing) {
+                        existing.quantity++;
+                    } else {
+                        this.cart.push({ ...product, quantity: 1 });
+                    }
+                },
+                
+                removeFromCart(productId) {
+                    const index = this.cart.findIndex(i => i.id === productId);
+                    if (index !== -1) {
+                        if (this.cart[index].quantity > 1) {
+                            this.cart[index].quantity--;
+                        } else {
+                            this.cart.splice(index, 1);
+                        }
+                    }
+                },
+                
+                get totalItems() {
+                    return this.cart.reduce((sum, item) => sum + item.quantity, 0);
+                },
+                
+                get totalPrice() {
+                    return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                },
+                
+                sendToWhatsApp() {
+                    if (this.cart.length === 0) return;
+
+                    let message = `*Nueva Solicitud - {{ $tenant->name }}*\n\n`;
+
+                    if (this.clientDetails.trim()) {
+                        message += `👤 *Cliente/Envío:* ${this.clientDetails.trim()}\n\n`;
+                    }
+
+                    this.cart.forEach(item => {
+                        message += `• ${item.quantity}x ${item.name} - S/ ${(item.price * item.quantity).toFixed(2)}\n`;
+                    });
+                    
+                    message += `\n*TOTAL:* S/ ${this.totalPrice.toFixed(2)}`;
+
+                    const url = `https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;
+                    window.open(url, '_blank');
                 }
             }));
         });
