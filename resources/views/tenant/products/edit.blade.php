@@ -65,7 +65,7 @@
                                     @endif
                                     
                                     <div class="flex flex-col sm:flex-row gap-2 mt-2">
-                                        <button type="button" onclick="let i = document.getElementById('image'); i.setAttribute('capture', 'environment'); i.click();" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
+                                        <button type="button" onclick="let i = document.getElementById('image'); i.setAttribute('capture', 'environment'); i.click();" class="sm:hidden inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full">
                                             📸 Usar Cámara
                                         </button>
                                         <button type="button" onclick="let i = document.getElementById('image'); i.removeAttribute('capture'); i.click();" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">

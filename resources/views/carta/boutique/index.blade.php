@@ -67,7 +67,7 @@
             <div class="flex justify-between items-center h-24">
                 <div class="flex items-center gap-6">
                     @if($tenant->logo)
-                        <img src="{{ Storage::url($tenant->logo) }}" alt="{{ $tenant->name }}" class="h-14 w-auto object-contain">
+                        <img src="{{ $tenant->logo }}" alt="{{ $tenant->name }}" class="h-14 w-auto object-contain">
                     @else
                         <div class="h-12 w-12 rounded-sm border md:border-2 border-brand/40 dark:border-brand/50 flex items-center justify-center text-brand font-serif font-bold text-2xl shadow-[0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_15px_rgba(205,162,94,0.2)]">
                             {{ substr($tenant->name, 0, 1) }}
@@ -134,7 +134,7 @@
                                         <div class="absolute inset-0 bg-gradient-to-t from-gray-100 dark:from-[#121212] to-transparent opacity-80 z-0"></div>
                                         
                                         @if($product->image)
-                                            <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl">
+                                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl">
                                         @else
                                             <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-brand/20 group-hover:text-brand/40 transition-colors duration-500">
                                                 <svg class="w-24 h-24 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 22.5A3 3 0 0 0 22.5 19.5v-3.375c0-.986-.4-1.92-1.11-2.61l-5.64-5.55a1.5 1.5 0 0 0-1.5-.42L12 8A4.5 4.5 0 0 0 7.5 19.5v3H19.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m15.5 8-.5-1.5a1.5 1.5 0 0 0-.42-1.5L9 2.25A3 3 0 0 0 6 5.25v3.375c0 .986.4 1.92 1.11 2.61l5.64 5.55a1.5 1.5 0 0 0 1.5.42L16.5 16A4.5 4.5 0 0 0 21 4.5v-3H9" /></svg>
@@ -156,7 +156,7 @@
                                         <div class="mt-auto w-full pt-6 border-t border-gray-100 dark:border-white/5 flex flex-col items-center gap-4">
                                             <span class="text-xl font-bold tracking-widest text-gray-900 dark:text-white">S/ {{ number_format($product->price, 2) }}</span>
                                             
-                                            <button @click.prevent="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->price }}, image: '{{ Storage::url($product->image) }}' })"
+                                            <button @click.prevent="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->price }}, image: '{{ $product->image }}' })"
                                                class="w-full py-3 px-6 bg-transparent border border-brand text-brand hover:bg-brand hover:text-white dark:hover:text-black transition-all duration-300 text-[10px] uppercase tracking-[0.2em] font-bold text-center rounded-sm">
                                                 Añadir al Carrito
                                             </button>
