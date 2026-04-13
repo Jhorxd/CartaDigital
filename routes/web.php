@@ -53,5 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Ruta secreta para inyectar datos de prueba sin usar la terminal de Linux
+Route::get('/instalar-perfumeria-secreta', function () {
+    app(\Database\Seeders\PerfumeTenantSeeder::class)->run();
+    return '<b>¡Perfumeria instalada con éxito desde la Web!</b><br><br>Ya puedes entrar a tu sistema con el usuario admin@arabian.localhost y la clave password123 (o los datos que hayas configurado en tu panel).<br>No olvides borrar esta ruta de routes/web.php por seguridad.';
+});
+
 // Rutas de Autenticación Unificadas (Login, Logout, etc.)
 require __DIR__.'/auth.php';
