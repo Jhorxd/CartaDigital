@@ -96,7 +96,7 @@
         <!-- Search Bar -->
         <div class="mb-12 max-w-lg mx-auto">
             <div class="relative">
-                <input type="text" x-model="searchQuery" placeholder="Buscar perfumes en tiempo real..." class="w-full bg-white/50 dark:bg-black/30 border border-brand/20 focus:border-brand/80 rounded-full px-6 py-4 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1 focus:ring-brand shadow-sm backdrop-blur-md transition-all">
+                <input type="text" x-model="searchQuery" placeholder="Buscar perfumes..." class="w-full bg-white/50 dark:bg-black/30 border border-brand/20 focus:border-brand/80 rounded-full px-6 py-4 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1 focus:ring-brand shadow-sm backdrop-blur-md transition-all">
                 <div class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-brand">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
