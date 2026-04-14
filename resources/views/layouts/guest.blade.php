@@ -5,7 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $tenant = request()->get('tenant');
+            $brandColor = $tenant->brand_color ?? '#6366f1'; // Premium Indigo
+            $pageTitle = $tenant ? __('Login') . ' | ' . $tenant->name : __('Admin') . ' | ' . config('app.name', 'Laravel');
+        @endphp
+
+        <title>{{ $pageTitle }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,11 +34,6 @@
         </script>
     </head>
     <body class="font-sans text-slate-900 antialiased overflow-x-hidden selection:bg-[--brand-color] selection:text-white">
-        @php
-            $tenant = request()->get('tenant');
-            $brandColor = $tenant->brand_color ?? '#6366f1'; // Premium Indigo
-        @endphp
-
         <style>
             :root {
                 --brand-color: {{ $brandColor }};
