@@ -18,15 +18,16 @@
                             <!-- Col Izquierda -->
                             <div class="space-y-6">
                                 <div>
-                                    <x-input-label for="category_id" :value="__('Categoría')" />
-                                    <select id="category_id" name="category_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <x-input-label :value="__('Categorías relacionadas')" class="mb-2" />
+                                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-4 border border-gray-300 rounded-md shadow-sm max-h-48 overflow-y-auto">
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
-                                            </option>
+                                            <label class="inline-flex items-center">
+                                                <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ in_array($category->id, old('categories', $product->categories->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                                <span class="ms-2 text-sm text-gray-700 font-medium truncate">{{ $category->name }}</span>
+                                            </label>
                                         @endforeach
-                                    </select>
-                                    <x-input-error class="mt-2" :messages="$errors->get('category_id')" />
+                                    </div>
+                                    <x-input-error class="mt-2" :messages="$errors->get('categories')" />
                                 </div>
 
                                 <div>

@@ -91,11 +91,24 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" x-data="{ activeTab: {{ $categories->first()->id ?? 'null' }} }">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" x-data="{ activeTab: {{ $categories->first()->id ?? 'null' }}, searchQuery: '{{ request('search') }}' }">
         
+        <!-- Search Bar -->
+        <div class="mb-12 max-w-lg mx-auto">
+            <div class="relative">
+                <input type="text" x-model="searchQuery" placeholder="Buscar perfumes..." class="w-full bg-white/50 dark:bg-black/30 border border-brand/20 focus:border-brand/80 rounded-full px-6 py-4 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1 focus:ring-brand shadow-sm backdrop-blur-md transition-all">
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-brand">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+            <div x-cloak x-show="searchQuery !== ''" class="mt-4 text-center">
+                <button @click="searchQuery = ''" class="text-xs text-brand hover:underline tracking-widest uppercase">Limpiar búsqueda</button>
+            </div>
+        </div>
+
         @if($categories->count() > 0)
             <!-- Elegant Tabs -->
-            <div class="mb-16 flex flex-col items-center">
+            <div class="mb-16 flex flex-col items-center" x-show="searchQuery === ''" x-transition>
                 <h2 class="text-xs uppercase tracking-[0.4em] text-gray-400 dark:text-white/40 mb-8 font-medium">Nuestras Galerías</h2>
                 <div class="w-full overflow-x-auto hide-scrollbar">
                     <div class="flex gap-4 md:gap-8 justify-start md:justify-center whitespace-nowrap min-w-max px-2 border-b border-gray-200 dark:border-white/10">
@@ -116,8 +129,9 @@
 
             <!-- Perfume Showcase Grid -->
             <div class="min-h-[500px]">
+                <!-- Static Categories Grids -->
                 @foreach($categories as $category)
-                    <div x-show="activeTab === {{ $category->id }}"
+                    <div x-show="activeTab === {{ $category->id }} && searchQuery === ''"
                          x-transition:enter="transition ease-out duration-700 delay-100"
                          x-transition:enter-start="opacity-0 transform translate-y-8"
                          x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -167,6 +181,54 @@
                         @endforeach
                     </div>
                 @endforeach
+                
+                <!-- Live Search Results Grid -->
+                <div x-cloak x-show="searchQuery !== ''"
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 transform translate-y-4"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
+                     
+                     @php
+                        $allProducts = $categories->flatMap->products->unique('id')->where('is_active', true);
+                     @endphp
+                     
+                     @foreach($allProducts as $product)
+                         <div class="luxury-card light bg-white dark:bg-gradient-to-br dark:from-[#161616] dark:to-[#0e0e0e] rounded-sm overflow-hidden flex flex-col group border border-gray-100 dark:border-white/5 relative"
+                              x-show="'{{ mb_strtolower(addslashes($product->name), 'UTF-8') }}'.includes(searchQuery.toLowerCase().trim())"
+                              x-transition:enter="transition ease-out duration-300">
+                             <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
+                             <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
+                             
+                             <div class="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-black flex items-center justify-center p-8">
+                                 <div class="absolute inset-0 bg-gradient-to-t from-gray-100 dark:from-[#121212] to-transparent opacity-80 z-0"></div>
+                                 
+                                 @if($product->image)
+                                     <img src="{{ $product->image }}" alt="{{ $product->name }}" class="absolute inset-0 w-full h-full object-contain p-4 relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl bg-white dark:bg-white/5 rounded-t-sm">
+                                 @else
+                                     <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-brand/20 group-hover:text-brand/40 transition-colors duration-500">
+                                         <svg class="w-24 h-24 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 22.5A3 3 0 0 0 22.5 19.5v-3.375c0-.986-.4-1.92-1.11-2.61l-5.64-5.55a1.5 1.5 0 0 0-1.5-.42L12 8A4.5 4.5 0 0 0 7.5 19.5v3H19.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m15.5 8-.5-1.5a1.5 1.5 0 0 0-.42-1.5L9 2.25A3 3 0 0 0 6 5.25v3.375c0 .986.4 1.92 1.11 2.61l5.64 5.55a1.5 1.5 0 0 0 1.5.42L16.5 16A4.5 4.5 0 0 0 21 4.5v-3H9" /></svg>
+                                     </div>
+                                 @endif
+                             </div>
+                             
+                             <div class="p-6 md:p-8 flex-1 flex flex-col items-center text-center bg-white dark:bg-[#121212] z-10">
+                                 <h3 class="font-serif text-lg md:text-xl text-gray-900 dark:text-white mb-3 tracking-wide group-hover:text-brand transition-colors duration-300 leading-snug">{{ $product->name }}</h3>
+                                 @if($product->description)
+                                     <p class="text-[11px] text-gray-500 dark:text-white/50 mb-6 font-medium dark:font-light leading-relaxed flex-1 tracking-wide">{{ $product->description }}</p>
+                                 @endif
+                                 <div class="mt-auto w-full pt-6 border-t border-gray-100 dark:border-white/5 flex flex-col items-center gap-4">
+                                     <span class="text-xl font-bold tracking-widest text-gray-900 dark:text-white">S/ {{ number_format($product->price, 2) }}</span>
+                                     <button @click.prevent="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->price }}, image: '{{ $product->image }}' })"
+                                        class="w-full py-3 px-6 bg-transparent border border-brand text-brand hover:bg-brand hover:text-white dark:hover:text-black transition-all duration-300 text-[10px] uppercase tracking-[0.2em] font-bold text-center rounded-sm">
+                                         Añadir al Carrito
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+                     @endforeach
+                     
+                </div>
             </div>
         @else
             <div class="flex flex-col items-center justify-center py-32 opacity-30">

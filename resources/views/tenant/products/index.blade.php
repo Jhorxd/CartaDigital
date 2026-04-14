@@ -84,7 +84,7 @@
                                         <div class="text-xs text-gray-500 truncate max-w-xs">{{ $product->description }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $product->category->name ?? 'Sin categoría' }}
+                                        {{ $product->categories->pluck('name')->join(', ') ?: 'Sin categoría' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap font-bold text-emerald-600">
                                         S/ {{ number_format($product->price, 2) }}
@@ -130,7 +130,7 @@
                                     </div>
                                     <p class="text-xs text-gray-500 line-clamp-2 mt-1">{{ $product->description }}</p>
                                     <div class="mt-2 flex justify-between items-center">
-                                        <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{{ $product->category->name ?? 'Sin cat.' }}</span>
+                                        <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded truncate max-w-[150px]">{{ $product->categories->pluck('name')->join(', ') ?: 'Sin cat.' }}</span>
                                         <span class="font-black text-emerald-600">S/ {{ number_format($product->price, 2) }}</span>
                                     </div>
                                 </div>
