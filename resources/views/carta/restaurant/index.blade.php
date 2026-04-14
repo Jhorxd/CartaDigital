@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $tenant->name }} | {{ config('app.name') }}</title>
+    <title>{{ $tenant->name }} | Carta Digital Gastronómica</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
