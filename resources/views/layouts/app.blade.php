@@ -5,8 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ (isset($tenant) ? $tenant->name : (request()->get('tenant') ? request()->get('tenant')->name : config('app.name'))) }} | {{ config('app.name') }}</title>
-        <link rel="icon" type="image/png" href="{{ (isset($tenant) && $tenant->logo) ? $tenant->logo : (request()->get('tenant') && request()->get('tenant')->logo ? request()->get('tenant')->logo : asset('favicon.png')) }}">
+        @php
+            $currentTenant = $tenant ?? request()->get('tenant');
+            $pageTitle = $currentTenant ? $currentTenant->name : config('app.name', 'Laravel');
+            $favicon = ($currentTenant && $currentTenant->logo) ? $currentTenant->logo : asset('favicon.png');
+        @endphp
+
+        <title>{{ $pageTitle }} | {{ config('app.name') }}</title>
+        <link rel="icon" type="image/png" href="{{ $favicon }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

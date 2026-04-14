@@ -33,6 +33,7 @@ class IdentifyTenant
             if ($tenant) {
                 app()->instance('tenant_id', $tenant->id);
                 $request->attributes->add(['tenant' => $tenant]);
+                view()->share('tenant', $tenant);
                 
                 // Set default parameter for route() generation
                 \Illuminate\Support\Facades\URL::defaults(['tenant' => $subdomain]);
