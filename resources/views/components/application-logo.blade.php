@@ -1,44 +1,48 @@
 @php
     $tenant = $tenant ?? (request()->get('tenant') ?? null);
+    // Determine if we are in a "compact" mode (like a navbar) or "hero" mode (like login)
+    // We can check if specific height classes are passed in
+    $isCompact = str_contains($attributes->get('class', ''), 'h-9') || str_contains($attributes->get('class', ''), 'h-8') || str_contains($attributes->get('class', ''), 'h-10');
 @endphp
 
 @if($tenant)
-    <div {{ $attributes->merge(['class' => 'flex flex-col items-center gap-4']) }}>
+    <div {{ $attributes->merge(['class' => 'flex items-center gap-3']) }}>
         @if($tenant->logo)
-            <div class="p-1 bg-white rounded-3xl shadow-2xl transform transition hover:scale-105 duration-300">
-                <img src="{{ $tenant->logo }}" class="h-24 w-24 object-cover rounded-[1.25rem]" alt="{{ $tenant->name }}">
-            </div>
+            <img src="{{ $tenant->logo }}" class="{{ $isCompact ? 'h-10 w-10' : 'h-24 w-24' }} object-cover rounded-xl shadow-md" alt="{{ $tenant->name }}">
         @else
-            {{-- Professional Placeholder for Tenants without Logo --}}
-            <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-[--brand-color] to-white/20 rounded-3xl blur opacity-25 transition duration-1000"></div>
-                <div class="relative h-24 w-24 rounded-3xl shadow-2xl flex items-center justify-center text-white font-black text-5xl transform transition hover:scale-105 duration-300 border-2 border-white/10" style="background-color: var(--brand-color); text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
-                    {{ strtoupper(substr($tenant->name, 0, 1)) }}
-                </div>
+            <div class="{{ $isCompact ? 'h-10 w-10 text-xl' : 'h-24 w-24 text-5xl' }} rounded-xl shadow-lg flex items-center justify-center text-white font-black border-2 border-white/10" style="background-color: var(--brand-color);">
+                {{ strtoupper(substr($tenant->name, 0, 1)) }}
             </div>
         @endif
         
-        <div class="flex flex-col items-center">
-            <div class="font-black text-3xl tracking-tighter text-slate-100 drop-shadow-md">
-                {{ $tenant->name }}
+        @if(!$isCompact)
+            <div class="flex flex-col items-center">
+                <div class="font-black text-3xl tracking-tighter text-slate-100 drop-shadow-md">
+                    {{ $tenant->name }}
+                </div>
+                <div class="h-1.5 w-12 bg-white/20 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full bg-white/40 w-1/3"></div>
+                </div>
             </div>
-            <div class="h-1.5 w-12 bg-white/20 rounded-full mt-2 overflow-hidden">
-                <div class="h-full bg-white/40 w-1/3"></div>
-            </div>
-        </div>
+        @else
+            <span class="font-bold text-lg tracking-tight text-slate-800">{{ $tenant->name }}</span>
+        @endif
     </div>
 @else
-    {{-- Global Platform Logo (Admin Login) --}}
-    <div {{ $attributes->merge(['class' => 'flex flex-col items-center gap-4']) }}>
-        <div class="relative group">
-            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-            <img src="{{ asset('logo-sq.png') }}" class="relative h-24 w-24 object-contain rounded-3xl shadow-2xl transform transition hover:scale-105 duration-300" alt="Mi Carta Dig">
+    {{-- Global Platform Logo --}}
+    <div {{ $attributes->merge(['class' => 'flex items-center gap-3']) }}>
+        <div class="relative group shrink-0">
+            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <img src="{{ asset('favicon.png') }}" class="relative {{ $isCompact ? 'h-10 w-10' : 'h-24 w-24' }} object-contain rounded-xl shadow-xl transform transition hover:scale-105 duration-300" alt="Mi Carta Dig">
         </div>
-        <div class="flex flex-col items-center">
-            <div class="font-black text-3xl tracking-tighter text-slate-100 drop-shadow-md">
-                <span class="text-indigo-400 italic">Mi</span>CartaDig
+        
+        <div class="flex flex-col {{ $isCompact ? 'items-start' : 'items-center' }}">
+            <div class="font-black {{ $isCompact ? 'text-xl' : 'text-3xl' }} tracking-tighter {{ $isCompact ? 'text-slate-800' : 'text-slate-100' }} drop-shadow-sm">
+                <span class="text-indigo-600 italic">Mi</span>CartaDig
             </div>
-            <div class="h-1 w-8 bg-indigo-500 rounded-full mt-1 opacity-50"></div>
+            @if(!$isCompact)
+                <div class="h-1 w-8 bg-indigo-500 rounded-full mt-1 opacity-50"></div>
+            @endif
         </div>
     </div>
 @endif

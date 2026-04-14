@@ -14,7 +14,7 @@
                         @csrf
                         @method('PUT')
                         
-                        <!-- Sección Restaurante -->
+                        <!-- Sección Negocio -->
                         <div class="border-b pb-4">
                             <h3 class="text-lg font-bold text-gray-700 mb-4">🏠 Información del Local / Negocio</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -29,7 +29,7 @@
                                     <div class="flex items-center mt-1">
                                         <x-text-input id="subdomain" name="subdomain" type="text" class="block w-full rounded-r-none border-r-0" :value="old('subdomain', $tenant->subdomain)" required />
                                         <span class="inline-flex items-center px-4 py-2 border border-gray-300 bg-gray-50 text-gray-500 text-sm rounded-r-md">
-                                            .localhost
+                                            .{{ config('app.domain') }}
                                         </span>
                                     </div>
                                     <x-input-error class="mt-2" :messages="$errors->get('subdomain')" />
@@ -38,7 +38,7 @@
                             <div class="mt-6">
                                 <x-input-label for="business_type" :value="__('Tipo de Negocio')" />
                                 <select id="business_type" name="business_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                    <option value="restaurant" {{ old('business_type', $tenant->business_type) == 'restaurant' ? 'selected' : '' }}>Restaurante / Comida</option>
+                                    <option value="restaurant" {{ old('business_type', $tenant->business_type) == 'restaurant' ? 'selected' : '' }}>Restaurante / Cafetería / Comida</option>
                                     <option value="boutique" {{ old('business_type', $tenant->business_type) == 'boutique' ? 'selected' : '' }}>Boutique / Perfumería / Ropa</option>
                                 </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('business_type')" />

@@ -6,7 +6,7 @@
             </h2>
             <a href="{{ route('tenants.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Nuevo Restaurante
+                Nuevo Negocio
             </a>
         </div>
     </x-slot>
@@ -47,7 +47,7 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Restaurantes Totales</p>
+                        <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Negocios Totales</p>
                         <p class="text-3xl font-black text-slate-800">{{ $stats['total'] }}</p>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                                    class="pl-10 w-full rounded-2xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all px-4 py-2.5 text-sm">
                         </div>
                         <div class="text-sm text-slate-500">
-                            Mostrando <span class="font-bold text-slate-800" x-text="filteredTenants.length"></span> de {{ $stats['total'] }} restaurantes
+                            Mostrando <span class="font-bold text-slate-800" x-text="filteredTenants.length"></span> de {{ $stats['total'] }} negocios
                         </div>
                     </div>
 
@@ -97,7 +97,7 @@
                         <table class="min-w-full divide-y divide-slate-100">
                             <thead class="bg-slate-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Restaurante</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Negocio</th>
                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Dueño</th>
                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">URL / Subdominio</th>
                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Estado</th>
@@ -125,7 +125,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold space-x-2">
                                             <a :href="tenant.edit_url" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors">Editar</a>
-                                            <a :href="tenant.view_url" target="_blank" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg transition-colors">Carta</a>
+                                            <a :href="tenant.view_url" target="_blank" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg transition-colors">Tienda</a>
                                             <form :action="tenant.delete_url" method="POST" class="inline" @submit.prevent="if(confirm('¿Seguro?')) $el.submit()">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="text-rose-600 hover:text-rose-900 bg-rose-50 px-3 py-1.5 rounded-lg transition-colors">Baja</button>
@@ -137,7 +137,7 @@
                                 <tr x-show="filteredTenants.length === 0">
                                     <td colspan="5" class="px-6 py-12 text-center text-slate-400">
                                         <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        No se encontraron restaurantes con esos criterios.
+                                        No se encontraron negocios con esos criterios.
                                     </td>
                                 </tr>
                             </tbody>

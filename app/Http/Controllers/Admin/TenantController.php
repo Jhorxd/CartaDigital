@@ -60,7 +60,7 @@ class TenantController extends Controller
             'email_verified_at' => now(),
         ]);
         
-        return redirect()->route('dashboard')->with('status', 'Restaurante y usuario creados correctamente');
+        return redirect()->route('dashboard')->with('status', 'Negocio y usuario creados correctamente');
     }
 
     /**
@@ -121,6 +121,6 @@ class TenantController extends Controller
         User::where('tenant_id', $tenant->id)->delete();
         $tenant->delete();
 
-        return redirect()->route('dashboard')->with('status', 'Restaurante eliminado');
+        return redirect()->route('dashboard')->with('status', 'Negocio eliminado');
     }
 }
