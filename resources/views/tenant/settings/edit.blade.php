@@ -58,15 +58,37 @@
                                 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Identidad Visual</h3>
 
                                 {{-- Logo --}}
-                                <div>
+                                <div x-data="{ previewUrl: '{{ $tenant->logo }}', fileName: '' }">
                                     <x-input-label for="logo" :value="__('Logo del Restaurante')" />
                                     <div class="mt-2 flex items-center gap-4">
-                                        @if($tenant->logo)
-                                            <img src="{{ $tenant->logo }}" class="w-20 h-20 rounded-full border shadow-sm object-cover">
-                                        @else
-                                            <div class="w-20 h-20 bg-gray-100 rounded-full border border-dashed flex items-center justify-center text-gray-400 text-xs text-center">Sin logo</div>
-                                        @endif
-                                        <input id="logo" name="logo" type="file" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                        
+                                        <div class="relative group w-20 h-20 flex-shrink-0">
+                                            <template x-if="previewUrl">
+                                                <img :src="previewUrl" class="w-20 h-20 rounded-full border shadow-sm object-cover group-hover:opacity-75 transition-all">
+                                            </template>
+                                            <template x-if="!previewUrl">
+                                                <div class="w-20 h-20 bg-gray-100 rounded-full border border-dashed flex items-center justify-center text-gray-400 text-xs text-center">Sin logo</div>
+                                            </template>
+                                        </div>
+
+                                        <div class="flex flex-col gap-1 w-full overflow-hidden">
+                                            <button type="button" @click="$refs.logoInput.click()" class="w-fit px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md text-sm font-semibold hover:bg-indigo-100 transition whitespace-nowrap">
+                                                Cambiar Logo
+                                            </button>
+                                            <p x-cloak x-show="fileName" class="text-xs text-green-600 font-bold truncate w-full flex items-center gap-1">
+                                                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                <span x-text="fileName" class="truncate"></span>
+                                            </p>
+                                        </div>
+                                        
+                                        <input id="logo" x-ref="logoInput" name="logo" type="file" accept="image/*" class="hidden" 
+                                               @change="
+                                                    const file = $event.target.files[0];
+                                                    if (file) {
+                                                        fileName = file.name;
+                                                        previewUrl = URL.createObjectURL(file);
+                                                    }
+                                               " />
                                     </div>
                                     <x-input-error class="mt-2" :messages="$errors->get('logo')" />
                                 </div>

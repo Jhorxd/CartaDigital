@@ -57,26 +57,46 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('description')" />
                                 </div>
 
-                                <div x-data="{ fileName: '' }">
-                                    <x-input-label for="image" :value="__('Cambiar Imagen')" />
-                                    @if($product->image)
-                                        <div class="mt-2 mb-2">
-                                            <img src="{{ $product->image }}" class="w-32 h-32 object-cover rounded-lg border shadow-sm">
-                                        </div>
-                                    @endif
+                                <div x-data="{ 
+                                    previewUrl: '{{ $product->image }}', 
+                                    fileName: '' 
+                                }">
+                                    <x-input-label for="image" :value="__('Imagen del Producto')" />
+                                    
+                                    <!-- Vista Previa -->
+                                    <div class="mt-2 mb-4 relative group w-32 h-32">
+                                        <template x-if="previewUrl">
+                                            <img :src="previewUrl" class="w-32 h-32 object-cover rounded-lg border-2 border-indigo-100 shadow-md group-hover:opacity-75 transition-all">
+                                        </template>
+                                        <template x-if="!previewUrl">
+                                            <div class="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            </div>
+                                        </template>
+                                    </div>
                                     
                                     <div class="flex flex-col sm:flex-row gap-2 mt-2">
-                                        <button type="button" onclick="let i = document.getElementById('image'); i.setAttribute('capture', 'environment'); i.click();" class="sm:hidden inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full">
+                                        <button type="button" @click="$refs.imageInput.setAttribute('capture', 'environment'); $refs.imageInput.click();" class="sm:hidden inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full">
                                             📸 Usar Cámara
                                         </button>
-                                        <button type="button" onclick="let i = document.getElementById('image'); i.removeAttribute('capture'); i.click();" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
+                                        <button type="button" @click="$refs.imageInput.removeAttribute('capture'); $refs.imageInput.click();" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
                                             📁 Galería / Archivo
                                         </button>
                                     </div>
                                     
-                                    <input id="image" name="image" type="file" accept="image/*" class="hidden" @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''" />
+                                    <input id="image" x-ref="imageInput" name="image" type="file" accept="image/*" class="hidden" 
+                                           @change="
+                                                const file = $event.target.files[0];
+                                                if (file) {
+                                                    fileName = file.name;
+                                                    previewUrl = URL.createObjectURL(file);
+                                                }
+                                           " />
                                     
-                                    <p x-cloak x-show="fileName" class="mt-2 text-sm text-green-600 font-semibold" x-text="'Nuevo archivo: ' + fileName"></p>
+                                    <p x-cloak x-show="fileName" class="mt-2 text-sm text-green-600 font-bold flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <span x-text="'Listo: ' + fileName"></span>
+                                    </p>
                                     
                                     <x-input-error class="mt-2" :messages="$errors->get('image')" />
                                 </div>

@@ -11,12 +11,15 @@ class CartaController extends Controller
     public function index()
     {
         $tenant = request()->get('tenant');
-        $categories = Category::with(['products' => function($q) {
-            $q->orderBy('order_position');
+        $categories = Category::where('tenant_id', $tenant->id)->with(['products' => function($q) {
+            $q->where('is_active', true)->orderBy('order_position');
         }])->orderBy('order_position')->get();
 
         if ($tenant->business_type === 'boutique') {
             return view('carta.boutique.index', compact('tenant', 'categories'));
+        }
+        if ($tenant->business_type === 'urban') {
+            return view('carta.boutique.sneakers', compact('tenant', 'categories'));
         }
 
         return view('carta.restaurant.index', compact('tenant', 'categories'));

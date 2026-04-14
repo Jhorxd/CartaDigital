@@ -61,5 +61,27 @@
                 {{ $slot }}
             </main>
         </div>
+
+        <!-- Global Loader Overlay -->
+        <div id="global-loader" class="fixed inset-0 z-[110] bg-white/80 hidden flex-col items-center justify-center backdrop-blur-sm">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary shadow-lg mb-4"></div>
+            <p class="text-gray-700 font-semibold animate-pulse uppercase tracking-widest text-sm">Procesando...</p>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const forms = document.querySelectorAll('form');
+                forms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        // Ignore forms that submit to a new tab or specifically request no loader
+                        if (form.target === '_blank' || form.hasAttribute('data-no-loader')) return;
+                        
+                        const loader = document.getElementById('global-loader');
+                        loader.classList.remove('hidden');
+                        loader.classList.add('flex');
+                    });
+                });
+            });
+        </script>
     </body>
 </html>
