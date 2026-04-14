@@ -53,29 +53,26 @@ class TenantSeeder extends Seeder
 
         Product::create([
             'tenant_id' => $tenant1->id,
-            'category_id' => $catPollos->id,
             'name' => '1/4 de Pollo',
             'description' => 'Un cuarto de pollo con papas fritas y ensalada fresca.',
             'price' => 15.00,
             'order_position' => 1,
-        ]);
+        ])->categories()->attach($catPollos->id);
         
         Product::create([
             'tenant_id' => $tenant1->id,
-            'category_id' => $catPollos->id,
             'name' => '1 Pollo Entero',
             'description' => 'Pollo entero con papas familiares, ensalada y gaseosa 1.5L',
             'price' => 65.00,
             'order_position' => 2,
-        ]);
+        ])->categories()->attach($catPollos->id);
 
         Product::create([
             'tenant_id' => $tenant1->id,
-            'category_id' => $catBebidas->id,
             'name' => 'Inca Kola 1.5L',
             'price' => 10.00,
             'order_position' => 1,
-        ]);
+        ])->categories()->attach($catBebidas->id);
         
         app()->forgetInstance('tenant_id'); // Limpiar para futuros seeders
     }

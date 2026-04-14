@@ -15,14 +15,16 @@ class ProductController extends Controller
 {
     public function index(Request $request, $subdomain)
     {
-        $query = Product::with('category');
+        $query = Product::with('categories');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->category_id);
+            });
         }
 
         $products = $query->orderBy('order_position')->get();
@@ -40,7 +42,8 @@ class ProductController extends Controller
     public function store(Request $request, $subdomain)
     {
         $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -63,7 +66,11 @@ class ProductController extends Controller
             $validated['image'] = Storage::url('products/' . $filename);
         }
 
-        Product::create($validated);
+        $categories = $validated['categories'];
+        unset($validated['categories']);
+
+        $product = Product::create($validated);
+        $product->categories()->sync($categories);
 
         return redirect()->route('tenant.admin.products.index')
             ->with('status', 'Producto creado correctamente.');
@@ -78,7 +85,8 @@ class ProductController extends Controller
     public function update(Request $request, $subdomain, Product $product)
     {
         $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -107,8 +115,12 @@ class ProductController extends Controller
             $validated['image'] = Storage::url('products/' . $filename);
         }
 
+        $categories = $validated['categories'];
+        unset($validated['categories']);
+
         $validated['is_active'] = $request->has('is_active');
         $product->update($validated);
+        $product->categories()->sync($categories);
 
         return redirect()->route('tenant.admin.products.index')
             ->with('status', 'Producto actualizado correctamente.');
