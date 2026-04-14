@@ -8,55 +8,66 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Plus Jakarta Sans', 'Figtree', 'sans-serif'],
+                        },
+                    }
+                }
+            }
+        </script>
     </head>
-    <body class="font-sans text-gray-900 antialiased overflow-x-hidden">
+    <body class="font-sans text-slate-900 antialiased overflow-x-hidden selection:bg-[--brand-color] selection:text-white">
         @php
             $tenant = request()->get('tenant');
-            $brandColor = $tenant->brand_color ?? '#4f46e5'; // Indigo default
+            $brandColor = $tenant->brand_color ?? '#6366f1'; // Premium Indigo
         @endphp
 
         <style>
             :root {
                 --brand-color: {{ $brandColor }};
-                --brand-color-soft: {{ $brandColor }}22;
+                --brand-color-soft: {{ $brandColor }}15;
             }
             .bg-premium {
-                background: radial-gradient(circle at top right, var(--brand-color), transparent),
-                            radial-gradient(circle at bottom left, #7c3aed, transparent),
-                            #0f172a;
+                background-color: #030712;
+                background-image: 
+                    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                    radial-gradient(at 50% 0%, {{ $brandColor }}33 0, transparent 50%), 
+                    radial-gradient(at 100% 0%, hsla(225,39%,30%,1) 0, transparent 50%);
             }
             .glass {
-                background: rgba(255, 255, 255, 0.7);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
+                background: rgba(255, 255, 255, 0.03);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .glass-inner {
+                background: rgba(255, 255, 255, 1);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
         </style>
 
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-premium">
-            <div class="mb-8 transform transition hover:scale-105 duration-300">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center p-6 bg-premium">
+            <div class="mb-12 transform transition-all duration-700 hover:scale-105">
                 <a href="/">
-                    @if($tenant && $tenant->logo)
-                        <img src="{{ $tenant->logo }}" alt="{{ $tenant->name }}" class="h-24 w-auto drop-shadow-2xl">
-                    @else
-                        <div class="flex flex-col items-center">
-                            <x-application-logo class="w-20 h-20 fill-current text-white drop-shadow-lg" />
-                            @if($tenant)
-                                <span class="text-white font-bold text-2xl mt-4 tracking-tight">{{ $tenant->name }}</span>
-                            @endif
-                        </div>
-                    @endif
+                    <x-application-logo />
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-2 px-8 py-10 glass shadow-2xl overflow-hidden sm:rounded-3xl transform transition-all">
-                {{ $slot }}
+            <div class="w-full sm:max-w-md glass-inner shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden rounded-[2.5rem] border-white/20">
+                <div class="px-10 py-12">
+                    {{ $slot }}
+                </div>
             </div>
 
             @if(!$tenant)
