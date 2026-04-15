@@ -21,6 +21,9 @@ class CartaController extends Controller
         if ($tenant->business_type === 'urban') {
             return view('carta.urban.index', compact('tenant', 'categories'));
         }
+        if ($tenant->business_type === 'arreglos') {
+            return view('carta.arreglos.index', compact('tenant', 'categories'));
+        }
 
         return view('carta.restaurant.index', compact('tenant', 'categories'));
     }

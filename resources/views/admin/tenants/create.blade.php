@@ -40,6 +40,8 @@
                                     <option value="restaurant" {{ old('business_type') == 'restaurant' ? 'selected' : '' }}>Restaurante / Cafetería / Comida</option>
                                     <option value="boutique" {{ old('business_type') == 'boutique' ? 'selected' : '' }}>Boutique / Perfumería / Ropa</option>
                                     <option value="urban" {{ old('business_type') == 'urban' ? 'selected' : '' }}>Urbano / Zapatillas</option>
+                                    <option value="arreglos" {{ old('business_type') == 'arreglos' ? 'selected' : '' }}>Arreglos / Floreria</option>
+
                                 </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('business_type')" />
                             </div>
