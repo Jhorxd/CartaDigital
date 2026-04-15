@@ -61,7 +61,7 @@
     <!-- Hero / Header -->
     <header class="relative h-96 w-full overflow-hidden">
         <div class="absolute inset-0 scale-110 bg-cover bg-center transition-all duration-1000" 
-             style="background-image: url('https://images.unsplash.com/photo-1514361892635-6b07e31e75f9?auto=format&fit=crop&w=1200&q=80')">
+             style="background-image: url('{{ $tenant->cover_image ?? 'https://images.unsplash.com/photo-1514361892635-6b07e31e75f9?auto=format&fit=crop&w=1200&q=80' }}')">
         </div>
         <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-gray-50 dark:to-black"></div>
         
@@ -147,9 +147,9 @@
         
         <div class="flex gap-5 overflow-x-auto hide-scrollbar px-8 pb-4 pr-12">
             @foreach($featured as $product)
-            <div @click="addToCart({ 
+            <div @click="openProductModal({ 
                                     id: {{ $product->id }}, 
-                                    name: '{{ $product->name }}', 
+                                    name: '{{ addslashes($product->name) }}', 
                                     price: {{ $product->price }}, 
                                     image: '{{ $product->image ?? '' }}' 
                                 })"
@@ -217,9 +217,9 @@
                 @foreach($category->products as $product)
                 <div x-show="search === '' || '{{ strtolower($product->name) }}'.includes(search.toLowerCase())"
                      @if($product->is_active)
-                     @click="addToCart({ 
+                     @click.prevent="openProductModal({ 
                                     id: {{ $product->id }}, 
-                                    name: '{{ $product->name }}', 
+                                    name: '{{ addslashes($product->name) }}', 
                                     price: {{ $product->price }}, 
                                     image: '{{ $product->image ?? '' }}' 
                                 })"
@@ -287,6 +287,78 @@
         @endforeach
     </main>
 
+    <!-- Modal: Añadir producto con indicación -->
+    <div x-cloak x-show="openProductModal"
+         class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center px-4 pb-8 sm:pb-0"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="openProductModal = false"></div>
+
+        <!-- Modal Card -->
+        <div class="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="translate-y-8 scale-95 opacity-0"
+             x-transition:enter-end="translate-y-0 scale-100 opacity-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="translate-y-0 scale-100 opacity-100"
+             x-transition:leave-end="translate-y-8 scale-95 opacity-0">
+
+            <!-- Imagen del producto -->
+            <template x-if="pendingProduct && pendingProduct.image">
+                <div class="h-44 w-full relative overflow-hidden">
+                    <img :src="pendingProduct.image" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent"></div>
+                </div>
+            </template>
+
+            <div class="p-6 pt-4">
+                <!-- Info del producto -->
+                <div class="mb-4">
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white leading-tight" x-text="pendingProduct?.name"></h3>
+                    <p class="text-2xl font-black text-primary tracking-tighter mt-1">
+                        <span class="text-sm font-bold opacity-60">S/</span>
+                        <span x-text="pendingProduct?.price?.toFixed(2)"></span>
+                    </p>
+                </div>
+
+                <!-- Campo de indicación -->
+                <div class="mb-5">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                        📝 Indicación para este plato (opcional)
+                    </label>
+                    <input
+                        type="text"
+                        x-model="pendingNote"
+                        @keydown.enter="confirmAddToCart()"
+                        placeholder="Ej: sin ají, extra queso, sin cebolla..."
+                        class="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-primary/30 rounded-2xl px-4 py-3 text-sm font-semibold focus:outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-slate-600"
+                        x-init="$nextTick(() => { if (openProductModal) $el.focus() })"
+                    >
+                    <p class="text-[10px] text-slate-400 mt-1.5 ml-1">Se enviará junto al pedido por WhatsApp</p>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-3">
+                    <button @click="openProductModal = false"
+                            class="flex-1 h-12 rounded-2xl border-2 border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-black text-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition active:scale-95">
+                        Cancelar
+                    </button>
+                    <button @click="confirmAddToCart()"
+                            class="flex-[2] h-12 gradient-bg rounded-2xl text-white font-black text-sm shadow-lg shadow-primary/30 active:scale-95 transition flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                        Añadir al pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Cart (Dynamic Island Style) -->
     <div x-cloak x-show="totalItems > 0" 
          x-transition:enter="transition cubic-bezier(0.175, 0.885, 0.32, 1.275) duration-500 transform"
@@ -350,25 +422,54 @@
                     <!-- Items List -->
                     <div class="flex-1 overflow-y-auto px-8 py-6 space-y-6">
                         <template x-for="item in cart" :key="item.id">
-                            <div class="flex items-center gap-5 group animate-[fade-in-up_0.4s_ease-out]">
-                                <div class="w-20 h-20 rounded-[1.5rem] overflow-hidden shrink-0 shadow-lg border border-gray-100 dark:border-slate-800">
-                                    <img :src="item.image || 'https://via.placeholder.com/200'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-black text-slate-800 dark:text-white truncate" x-text="item.name"></h4>
-                                    <div class="flex items-center gap-3 mt-1">
-                                        <p class="text-primary font-black text-lg tracking-tighter">S/ <span x-text="(item.price * item.quantity).toFixed(2)"></span></p>
-                                        <span class="text-[10px] font-bold text-slate-400" x-text="'(S/ ' + item.price.toFixed(2) + ' c/u)'"></span>
+                            <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-gray-100 dark:border-slate-800 animate-[fade-in-up_0.4s_ease-out]">
+                                <div class="flex items-center gap-4 group">
+                                    <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-gray-100 dark:border-slate-800">
+                                        <img :src="item.image || 'https://via.placeholder.com/200'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-black text-slate-800 dark:text-white truncate text-sm" x-text="item.name"></h4>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <p class="text-primary font-black tracking-tighter">S/ <span x-text="(item.price * item.quantity).toFixed(2)"></span></p>
+                                            <span class="text-[10px] font-bold text-slate-400" x-text="'(S/ ' + item.price.toFixed(2) + ' c/u)'"></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 rounded-2xl p-1 border border-gray-100 dark:border-slate-700">
+                                        <button @click="removeFromCart(item.id)" class="w-7 h-7 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-700 transition active:scale-90 text-slate-400 hover:text-red-500">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"></path></svg>
+                                        </button>
+                                        <span class="text-sm font-black w-4 text-center" x-text="item.quantity"></span>
+                                        <button @click="addToCart(item)" class="w-7 h-7 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-700 transition active:scale-90 text-primary">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-900 rounded-2xl p-1.5 border border-gray-100 dark:border-slate-800">
-                                    <button @click="removeFromCart(item.id)" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-800 transition active:scale-90 text-slate-400 hover:text-red-500">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"></path></svg>
+                                <!-- Nota del producto -->
+                                <div class="mt-3" x-show="item.note">
+                                    <div class="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl px-3 py-2 border border-amber-100 dark:border-amber-800/30">
+                                        <span class="text-amber-500 text-xs mt-0.5">📝</span>
+                                        <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 leading-relaxed" x-text="item.note"></p>
+                                        <button @click="item.note = ''" class="ml-auto text-amber-400 hover:text-amber-600 transition shrink-0">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-2" x-show="!item.note || item.note === ''">
+                                    <button @click="item._editNote = !item._editNote" class="text-[10px] font-black text-slate-400 hover:text-primary transition flex items-center gap-1 uppercase tracking-widest">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                                        Añadir indicación
                                     </button>
-                                    <span class="text-sm font-black w-4 text-center" x-text="item.quantity"></span>
-                                    <button @click="addToCart(item)" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-800 transition active:scale-90 text-primary">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                                    </button>
+                                    <div x-show="item._editNote" x-transition class="mt-2">
+                                        <input type="text" 
+                                            x-model="item._tempNote"
+                                            @keydown.enter="item.note = item._tempNote; item._editNote = false"
+                                            placeholder="Ej: sin ají, extra queso, sin cebolla..."
+                                            class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-primary/40 placeholder:text-gray-300 dark:placeholder:text-slate-600 transition">
+                                        <div class="flex gap-2 mt-1.5">
+                                            <button @click="item.note = item._tempNote; item._editNote = false" class="text-[10px] bg-primary/10 text-primary font-black px-3 py-1.5 rounded-lg hover:bg-primary hover:text-white transition uppercase tracking-wide">Guardar</button>
+                                            <button @click="item._editNote = false; item._tempNote = ''" class="text-[10px] text-slate-400 font-black px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition uppercase tracking-wide">Cancelar</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -396,14 +497,26 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">🪑 Mesa / Nombre / Comentario</label>
-                            <input
-                                type="text"
-                                x-model="tableNumber"
-                                placeholder="Ej: Mesa 5, Para llevar, Sin cebolla..."
-                                class="w-full bg-white dark:bg-slate-950 border-2 border-transparent focus:border-primary/20 rounded-2xl px-6 py-4 text-base font-bold shadow-sm focus:outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-slate-800"
-                            >
+                        <!-- Campo: Para quién es el pedido -->
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">👤 ¿Para quién es el pedido?</label>
+                                <input
+                                    type="text"
+                                    x-model="customerName"
+                                    placeholder="Ej: Mesa 5, Juan, Para llevar..."
+                                    class="w-full bg-white dark:bg-slate-950 border-2 border-transparent focus:border-primary/30 rounded-2xl px-5 py-3.5 text-sm font-bold shadow-sm focus:outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-slate-700"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">💬 Comentario general (opcional)</label>
+                                <input
+                                    type="text"
+                                    x-model="orderComment"
+                                    placeholder="Ej: Urgente, alérgico a mariscos..."
+                                    class="w-full bg-white dark:bg-slate-950 border-2 border-transparent focus:border-primary/30 rounded-2xl px-5 py-3.5 text-sm font-bold shadow-sm focus:outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-slate-700"
+                                >
+                            </div>
                         </div>
 
                         <button @click="sendToWhatsApp" class="w-full h-20 gradient-bg rounded-3xl text-white font-black text-lg shadow-2xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group">
@@ -428,9 +541,13 @@
 
             Alpine.data('cartManager', () => ({
                 cart: [],
-                tableNumber: '',
+                customerName: '',
+                orderComment: '',
                 activeCategory: '{{ $categories->first()->id ?? 0 }}',
                 openDrawer: false,
+                openProductModal: false,
+                pendingProduct: null,
+                pendingNote: '',
                 search: '',
                 
                 // All products to help with search without full re-render
@@ -442,12 +559,33 @@
                     return cat ? cat.products.some(p => p.includes(this.search.toLowerCase())) : false;
                 },
                 
+                openProductModal(product) {
+                    this.pendingProduct = product;
+                    this.pendingNote = '';
+                    this.openProductModal = true;
+                },
+
+                confirmAddToCart() {
+                    if (!this.pendingProduct) return;
+                    const product = this.pendingProduct;
+                    const existing = this.cart.find(i => i.id === product.id);
+                    if (existing) {
+                        existing.quantity++;
+                        if (this.pendingNote.trim()) existing.note = this.pendingNote.trim();
+                    } else {
+                        this.cart.push({ ...product, quantity: 1, note: this.pendingNote.trim(), _editNote: false, _tempNote: '' });
+                    }
+                    this.openProductModal = false;
+                    this.pendingProduct = null;
+                    this.pendingNote = '';
+                },
+
                 addToCart(product) {
                     const existing = this.cart.find(i => i.id === product.id);
                     if (existing) {
                         existing.quantity++;
                     } else {
-                        this.cart.push({ ...product, quantity: 1 });
+                        this.cart.push({ ...product, quantity: 1, note: '', _editNote: false, _tempNote: '' });
                     }
                 },
                 
@@ -475,17 +613,27 @@
 
                     let message = '';
 
-                    // Incluir mesa si fue proporcionada
-                    if (this.tableNumber.trim()) {
-                        message += `🪑 *${this.tableNumber.trim()}* | {{ $tenant->name }}\n\n`;
+                    // Encabezado del pedido
+                    if (this.customerName.trim()) {
+                        message += `🧾 *Pedido para: ${this.customerName.trim()}*\n`;
+                        message += `🏪 {{ $tenant->name }}\n\n`;
                     } else {
-                        message += `*Nuevo Pedido - {{ $tenant->name }}*\n\n`;
+                        message += `🧾 *Nuevo Pedido - {{ $tenant->name }}*\n\n`;
                     }
 
+                    message += `📋 *Detalle del pedido:*\n`;
                     this.cart.forEach(item => {
-                        message += `• ${item.quantity}x ${item.name} - S/ ${(item.price * item.quantity).toFixed(2)}\n`;
+                        message += `\n• ${item.quantity}x *${item.name}* - S/ ${(item.price * item.quantity).toFixed(2)}`;
+                        if (item.note && item.note.trim()) {
+                            message += `\n  📝 _${item.note.trim()}_`;
+                        }
                     });
-                    message += `\n*Total: S/ ${this.totalPrice.toFixed(2)}*`;
+
+                    message += `\n\n💰 *Total: S/ ${this.totalPrice.toFixed(2)}*`;
+
+                    if (this.orderComment.trim()) {
+                        message += `\n\n💬 *Nota:* ${this.orderComment.trim()}`;
+                    }
 
                     const url = `https://wa.me/{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;
                     window.open(url, '_blank');

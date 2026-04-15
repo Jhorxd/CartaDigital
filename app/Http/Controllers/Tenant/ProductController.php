@@ -58,11 +58,11 @@ class ProductController extends Controller
             $filename = Str::random(40) . '.webp';
             
             // Procesar imagen: redimensionar a 800px de ancho y convertir a WebP
-            $image = $manager->read($imageFile);
+            $image = $manager->decode($imageFile->getPathname());
             $image->scale(width: 800);
-            $encoded = $image->toWebp(75);
+            $encoded = $image->encodeUsingFileExtension('webp', quality: 75);
             
-            Storage::disk('public')->put('products/' . $filename, $encoded);
+            Storage::disk('public')->put('products/' . $filename, (string) $encoded);
             $validated['image'] = Storage::url('products/' . $filename);
         }
 
@@ -107,11 +107,11 @@ class ProductController extends Controller
             $filename = Str::random(40) . '.webp';
             
             // Procesar imagen: redimensionar a 800px de ancho y convertir a WebP
-            $image = $manager->read($imageFile);
+            $image = $manager->decode($imageFile->getPathname());
             $image->scale(width: 800);
-            $encoded = $image->toWebp(75);
+            $encoded = $image->encodeUsingFileExtension('webp', quality: 75);
             
-            Storage::disk('public')->put('products/' . $filename, $encoded);
+            Storage::disk('public')->put('products/' . $filename, (string) $encoded);
             $validated['image'] = Storage::url('products/' . $filename);
         }
 

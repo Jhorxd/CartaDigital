@@ -13,6 +13,7 @@ class Tenant extends Model
         'name',
         'subdomain',
         'logo',
+        'cover_image',
         'address',
         'whatsapp',
         'schedule',
