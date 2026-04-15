@@ -181,18 +181,39 @@
         <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">Resultados de búsqueda</h3>
     </div>
 
-    <!-- Sticky Tabs Navigation -->
-    <nav class="sticky top-0 z-40 glass shadow-2xl py-4 overflow-x-auto hide-scrollbar mb-4" x-show="search === ''">
-        <div class="flex gap-8 px-8 pr-16 items-center">
-            @foreach($categories as $category)
-            <button @click="activeCategory = '{{ $category->id }}'" 
-               class="whitespace-nowrap py-2 text-sm font-black transition-all border-b-4 border-transparent hover:text-primary active:scale-90"
-               :class="activeCategory == '{{ $category->id }}' ? 'border-primary text-primary scale-110' : 'text-slate-400 dark:text-slate-500 opacity-60'">
-                {{ $category->name }}
-            </button>
-            @endforeach
+    <!-- Sticky Tabs Navigation con Indicador de Scroll -->
+    <div class="sticky top-0 z-40 relative group/tabs">
+        <!-- Gradientes laterales -->
+        <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-gray-50 dark:from-black to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-gray-50 dark:from-black to-transparent z-10 pointer-events-none"></div>
+        
+        <!-- Flecha Indicadora -->
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal">
+            <svg class="w-5 h-5 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
         </div>
-    </nav>
+
+        <style>
+            @keyframes bounce-horizontal {
+                0%, 100% { transform: translate(-25%, -50%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+                50% { transform: translate(0, -50%); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+            }
+            .animate-bounce-horizontal { animation: bounce-horizontal 1s infinite; }
+        </style>
+
+        <nav class="glass shadow-2xl py-4 overflow-x-auto hide-scrollbar" 
+             x-show="search === ''"
+             x-init="$el.scrollTo({left: 40, behavior: 'smooth'}); setTimeout(() => $el.scrollTo({left: 0, behavior: 'smooth'}), 600)">
+            <div class="flex gap-8 px-8 pr-20 items-center">
+                @foreach($categories as $category)
+                <button @click="activeCategory = '{{ $category->id }}'" 
+                   class="whitespace-nowrap py-2 text-sm font-black transition-all border-b-4 border-transparent hover:text-primary active:scale-90"
+                   :class="activeCategory == '{{ $category->id }}' ? 'border-primary text-primary scale-110' : 'text-slate-400 dark:text-slate-500 opacity-60'">
+                    {{ $category->name }}
+                </button>
+                @endforeach
+            </div>
+        </nav>
+    </div>
 
     <!-- Menu Content -->
     <main class="p-6 sm:p-8 space-y-12 pb-32">

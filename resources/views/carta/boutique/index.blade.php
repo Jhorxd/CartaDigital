@@ -111,19 +111,40 @@
             <!-- Elegant Tabs -->
             <div class="mb-16 flex flex-col items-center" x-show="searchQuery === ''" x-transition>
                 <h2 class="text-xs uppercase tracking-[0.4em] text-gray-400 dark:text-white/40 mb-8 font-medium">Nuestras Galerías</h2>
-                <div class="w-full overflow-x-auto hide-scrollbar">
-                    <div class="flex gap-4 md:gap-8 justify-start md:justify-center whitespace-nowrap min-w-max px-2 border-b border-gray-200 dark:border-white/10">
-                        @foreach($categories as $category)
-                            <button 
-                                @click="activeTab = {{ $category->id }}"
-                                class="relative pb-4 text-sm md:text-base tracking-[0.1em] uppercase font-bold transition-all duration-300 focus:outline-none"
-                                :class="activeTab === {{ $category->id }} ? 'text-brand' : 'text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white/80'"
-                            >
-                                {{ $category->name }}
-                                <div class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-brand transform origin-left transition-transform duration-300"
-                                     :class="activeTab === {{ $category->id }} ? 'scale-x-100' : 'scale-x-0'"></div>
-                            </button>
-                        @endforeach
+                <!-- Galería de Categorías con Indicadores -->
+                <div class="w-full relative group/tabs">
+                    <!-- Gradientes laterales de lujo -->
+                    <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none"></div>
+                    
+                    <!-- Flecha Indicadora Elegante -->
+                    <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal">
+                        <svg class="w-5 h-5 text-brand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
+                    </div>
+
+                    <style>
+                        @keyframes bounce-horizontal {
+                            0%, 100% { transform: translate(-25%, -50%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+                            50% { transform: translate(0, -50%); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+                        }
+                        .animate-bounce-horizontal { animation: bounce-horizontal 1s infinite; }
+                    </style>
+
+                    <div class="overflow-x-auto hide-scrollbar"
+                         x-init="$el.scrollTo({left: 40, behavior: 'smooth'}); setTimeout(() => $el.scrollTo({left: 0, behavior: 'smooth'}), 600)">
+                        <div class="flex gap-4 md:gap-8 justify-start md:justify-center whitespace-nowrap min-w-max px-8 border-b border-gray-200 dark:border-white/10">
+                            @foreach($categories as $category)
+                                <button 
+                                    @click="activeTab = {{ $category->id }}"
+                                    class="relative pb-4 text-sm md:text-base tracking-[0.1em] uppercase font-bold transition-all duration-300 focus:outline-none"
+                                    :class="activeTab === {{ $category->id }} ? 'text-brand' : 'text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white/80'"
+                                >
+                                    {{ $category->name }}
+                                    <div class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-brand transform origin-left transition-transform duration-300"
+                                         :class="activeTab === {{ $category->id }} ? 'scale-x-100' : 'scale-x-0'"></div>
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>

@@ -120,15 +120,35 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8" x-data="{ activeCat: {{ $categories->first()->id ?? 'null' }} }">
         
-        <!-- Tabs Compactas -->
-        <div class="flex justify-start md:justify-center overflow-x-auto no-scrollbar gap-2 mb-10 pb-2">
-            @foreach($categories as $category)
-                <button @click="activeCat = {{ $category->id }}"
-                        class="text-[10px] font-black uppercase tracking-widest whitespace-nowrap px-6 py-3 border-2 transition-all flex-shrink-0"
-                        :class="activeCat === {{ $category->id }} ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-transparent text-slate-400 border-gray-100 dark:border-white/5 hover:border-slate-300'">
-                    {{ $category->name }}
-                </button>
-            @endforeach
+        <!-- Tabs Compactas con Indicador de Scroll -->
+        <div class="relative mb-10 group/tabs">
+            <!-- Gradientes laterales para indicar scroll -->
+            <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white dark:from-black to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white dark:from-black to-transparent z-10 pointer-events-none"></div>
+            
+            <!-- Flecha Indicadora Animada -->
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal">
+                <svg class="w-4 h-4 text-brand-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
+            </div>
+
+            <style>
+                @keyframes bounce-horizontal {
+                    0%, 100% { transform: translate(-25%, -50%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+                    50% { transform: translate(0, -50%); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+                }
+                .animate-bounce-horizontal { animation: bounce-horizontal 1s infinite; }
+            </style>
+            
+            <div class="flex justify-start md:justify-center overflow-x-auto no-scrollbar gap-2 pb-2 px-6"
+                 x-init="$el.scrollTo({left: 40, behavior: 'smooth'}); setTimeout(() => $el.scrollTo({left: 0, behavior: 'smooth'}), 600)">
+                @foreach($categories as $category)
+                    <button @click="activeCat = {{ $category->id }}"
+                            class="text-[10px] font-black uppercase tracking-widest whitespace-nowrap px-6 py-3 border-2 transition-all flex-shrink-0"
+                            :class="activeCat === {{ $category->id }} ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-transparent text-slate-400 border-gray-100 dark:border-white/5 hover:border-slate-300'">
+                        {{ $category->name }}
+                    </button>
+                @endforeach
+            </div>
         </div>
 
         <!-- Grid -->
