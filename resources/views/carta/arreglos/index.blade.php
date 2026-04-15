@@ -37,14 +37,22 @@
         .dark .luxury-card { background: rgba(30,30,30,0.4); border: 1px solid rgba(255,255,255,0.05); }
         .luxury-card:hover { transform: translateY(-8px); border-color: var(--brand-color); box-shadow: 0 25px 50px -12px rgba(225, 29, 72, 0.15); }
 
-        .floating-cart { 
-            position: fixed; bottom: 30px; right: 30px; z-index: 100;
-            width: 70px; height: 70px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 20px 50px rgba(225, 29, 72, 0.35);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Carterita Inteligente y Expansiva */
+        .floating-cart-container { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100;
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .floating-cart:hover { transform: scale(1.1) rotate(5deg); }
+        
+        .floating-cart { 
+            height: 70px; border-radius: 50px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #111827; overflow: hidden; white-space: nowrap;
+        }
+        .dark .floating-cart { background: white; color: #111827; }
+        .floating-cart:hover { transform: scale(1.05); filter: brightness(1.2); }
 
         .hero-bg { background-image: url('/boutique_flowers_header_1776283190160.png'); background-size: cover; background-position: center; }
 
@@ -52,6 +60,14 @@
         .dark .price-badge { background: #161616; border-color: rgba(255,255,255,0.1); }
         .price-currency { font-weight: 500; font-size: 0.65em; margin-right: 2px; vertical-align: baseline; opacity: 0.7; }
         .price-amount { font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; }
+        
+        /* Animación de acumulación */
+        @keyframes cart-pop { 
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .pop-animation { animation: cart-pop 0.4s ease-out; }
     </style>
 </head>
 <body class="antialiased transition-colors duration-500 body-bg text-gray-900 dark:text-gray-100" 
@@ -77,7 +93,7 @@
     <header class="relative h-[45vh] md:h-[55vh] flex items-center justify-center overflow-hidden hero-bg">
         <div class="absolute inset-0 bg-black/50"></div>
         <div class="relative z-10 text-center px-4 max-w-4xl space-y-4">
-            <h2 class="text-5xl md:text-8xl font-serif font-black text-white leading-[0.8] tracking-tighter drop-shadow-2xl"> Arte Floral <br> <span class="text-brand italic italic">Boutique</span> </h2>
+            <h2 class="text-5xl md:text-8xl font-serif font-black text-white leading-[0.8] tracking-tighter drop-shadow-2xl"> Arte Floral <br> <span class="text-brand italic font-bold">Boutique</span> </h2>
             <div class="flex justify-center"> <div class="h-1 w-20 bg-brand rounded-full my-4 shadow-lg shadow-brand/20"></div> </div>
             <p class="text-white text-[10px] md:text-sm font-bold tracking-[0.5em] uppercase opacity-90">Donde cada pétalo cuenta una historia</p>
         </div>
@@ -138,14 +154,26 @@
         </div>
     </main>
 
-    <!-- Floating Carterita (ALWAYS VISIBLE) -->
-    <button @click="openDrawer = true" class="floating-cart bg-brand text-white group">
-        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-        <!-- Dynamic Badge (Only visible if > 0) -->
-        <div x-show="totalItems > 0" x-transition class="absolute -top-1 -right-1 bg-white text-brand text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-black shadow-lg ring-2 ring-brand/10 animate-bounce" x-text="totalItems"></div>
-    </button>
+    <!-- Floating Carterita (ACCUMULATING PILL STYLE) -->
+    <div class="floating-cart-container">
+        <button @click="openDrawer = true" 
+                class="floating-cart text-white flex items-center transition-all"
+                :class="{ 'px-10 gap-4 w-auto': totalItems > 0, 'w-[70px]': totalItems === 0, 'pop-animation': animateCart }">
+            
+            <svg class="w-10 h-10 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            
+            <!-- Items Accumulation Stats -->
+            <div x-show="totalItems > 0" x-cloak x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 -translate-x-4" class="flex flex-col items-start leading-none shrink-0 border-l border-white/20 pl-4">
+                <span class="text-[10px] font-black uppercase tracking-widest text-accent" x-text="totalItems + (totalItems === 1 ? ' Producto' : ' Productos')"></span>
+                <span class="text-lg font-serif mt-1">S/ <span x-text="totalPrice.toFixed(2)"></span></span>
+            </div>
+            
+            <!-- Just the bag number when circle -->
+            <div x-show="totalItems > 0" class="md:hidden absolute -top-1 -right-1 bg-accent text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-black" x-text="totalItems"></div>
+        </button>
+    </div>
 
-    <!-- Cart Drawer -->
+    <!-- Same Cart Drawer as before... -->
     <div x-cloak x-show="openDrawer" class="fixed inset-0 z-[101] flex justify-end">
         <div x-show="openDrawer" @click="openDrawer = false" x-transition.opacity class="fixed inset-0 bg-black/80 backdrop-blur-md"></div>
         <div x-show="openDrawer" x-transition:enter="transform transition duration-500" x-transition:enter-start="translate-x-full" 
@@ -154,8 +182,6 @@
                 <h2 class="font-serif text-xl tracking-widest uppercase dark:text-white">CESTA DE COMPRA</h2>
                 <button @click="openDrawer = false" class="text-gray-400 p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            
-            <!-- Empty state check -->
             <div class="flex-1 overflow-y-auto px-6 py-6 space-y-4 hide-scrollbar flex flex-col">
                 <template x-if="cart.length === 0">
                     <div class="flex-1 flex flex-col items-center justify-center text-center space-y-4 opacity-40">
@@ -163,7 +189,6 @@
                         <p class="font-serif italic text-lg dark:text-white">Tu cesta está vacía,<br>¡elige algo hermoso!</p>
                     </div>
                 </template>
-
                 <template x-for="item in cart" :key="item.id">
                     <div class="flex items-center gap-4 bg-gray-50/50 dark:bg-zinc-900/50 p-3 rounded-sm border border-gray-100 dark:border-white/5 shadow-sm">
                         <div class="w-16 h-16 shrink-0 bg-white overflow-hidden border border-gray-100 dark:border-white/5"> <template x-if="item.image"><img :src="item.image" class="w-full h-full object-cover"></template> </div>
@@ -172,7 +197,6 @@
                     </div>
                 </template>
             </div>
-
             <div x-show="cart.length > 0" class="p-6 bg-white dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-white/5 space-y-4 shadow-inner">
                 <div class="flex justify-between items-center px-1"> <p class="text-[9px] font-bold uppercase text-gray-400 tracking-widest">TOTAL ESTIMADO</p> <p class="text-2xl font-serif dark:text-white">S/ <span x-text="totalPrice.toFixed(2)"></span></p> </div>
                 <div class="space-y-4">
@@ -193,9 +217,14 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('cartStore', () => ({
-                cart: [], openDrawer: false, clientName: '', clientDistrict: '', clientDept: '', deliveryDate: '', cardMessage: '',
-                addToCart(p) { const e = this.cart.find(i => i.id === p.id); if (e) { e.quantity++; } else { this.cart.push({ ...p, quantity: 1 }); } },
+                cart: [], openDrawer: false, clientName: '', clientDistrict: '', clientDept: '', deliveryDate: '', cardMessage: '', animateCart: false,
+                addToCart(p) { 
+                    const e = this.cart.find(i => i.id === p.id); 
+                    if (e) { e.quantity++; } else { this.cart.push({ ...p, quantity: 1 }); }
+                    this.triggerAnimation();
+                },
                 removeFromCart(id) { const i = this.cart.findIndex(p => p.id === id); if (i !== -1) { if (this.cart[i].quantity > 1) { this.cart[i].quantity--; } else { this.cart.splice(i, 1); } } },
+                triggerAnimation() { this.animateCart = true; setTimeout(() => this.animateCart = false, 400); },
                 get totalItems() { return this.cart.reduce((s, i) => s + i.quantity, 0); },
                 get totalPrice() { return this.cart.reduce((s, i) => s + (i.price * i.quantity), 0); },
                 getFilteredProducts(q) {

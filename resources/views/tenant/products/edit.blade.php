@@ -36,6 +36,8 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('name')" />
                                 </div>
 
+                                {{-- Campos de Marca desactivados para evitar errores de BD --}}
+                                {{-- 
                                 @if($tenant->business_type === 'urban')
                                 <div>
                                     <x-input-label for="brand" :value="__('Marca (Opcional)')" />
@@ -43,6 +45,7 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('brand')" />
                                 </div>
                                 @endif
+                                --}}
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
@@ -50,6 +53,8 @@
                                         <x-text-input id="price" name="price" type="number" step="0.01" class="mt-1 block w-full" :value="old('price', $product->price)" required />
                                         <x-input-error class="mt-2" :messages="$errors->get('price')" />
                                     </div>
+                                    {{-- Precio Anterior desactivado --}}
+                                    {{-- 
                                     @if($tenant->business_type === 'urban')
                                     <div>
                                         <x-input-label for="old_price" :value="__('Precio Anterior (Opcional)')" />
@@ -57,8 +62,11 @@
                                         <x-input-error class="mt-2" :messages="$errors->get('old_price')" />
                                     </div>
                                     @endif
+                                    --}}
                                 </div>
 
+                                {{-- Etiqueta / Badge desactivado --}}
+                                {{-- 
                                 @if($tenant->business_type === 'urban')
                                 <div>
                                     <x-input-label for="badge" :value="__('Etiqueta / Badge')" />
@@ -71,14 +79,40 @@
                                     </select>
                                     <x-input-error class="mt-2" :messages="$errors->get('badge')" />
                                 </div>
+                                @endif
+                                --}}
 
                                 <div>
-                                    <x-input-label for="sizes" :value="__('Tallas Disponibles')" />
-                                    <x-text-input id="sizes" name="sizes" type="text" class="mt-1 block w-full" :value="old('sizes', is_array($product->sizes) ? implode(', ', $product->sizes) : '')" placeholder="Ej: 38, 39, 40, 42" />
-                                    <p class="mt-1 text-xs text-gray-500 italic">Separa las tallas por comas.</p>
+                                    <x-input-label :value="__('Tallas Disponibles (Informativo)')" />
+                                    
+                                    <div x-data="{ 
+                                        selectedSizes: '{{ old('sizes', is_array($product->sizes) ? implode(', ', $product->sizes) : ($product->sizes ?? '')) }}'.split(',').map(s => s.trim()).filter(s => s !== '')
+                                    }" class="mt-2">
+                                        <div class="grid grid-cols-4 sm:grid-cols-5 gap-3 bg-gray-50 p-4 border border-gray-200 rounded-lg shadow-inner max-h-40 overflow-y-auto">
+                                            @foreach(['35','36','37','38','39','40','41','42','43','44','45'] as $size)
+                                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-100 shadow-sm hover:border-indigo-300 cursor-pointer transition-all">
+                                                    <input type="checkbox" value="{{ $size }}" x-model="selectedSizes" 
+                                                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                                    <span class="ms-2 text-xs font-bold text-gray-700">{{ $size }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                        
+                                        <input type="hidden" name="sizes" :value="selectedSizes.join(', ')">
+                                        
+                                        <div class="mt-2 flex items-center gap-2">
+                                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Seleccionadas:</span>
+                                            <template x-if="selectedSizes.length > 0">
+                                                <div class="flex flex-wrap gap-1">
+                                                    <template x-for="sz in selectedSizes" :key="sz">
+                                                        <span class="text-[9px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-black" x-text="sz"></span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
                                     <x-input-error class="mt-2" :messages="$errors->get('sizes')" />
                                 </div>
-                                @endif
                             </div>
 
                             <!-- Col Derecha -->
@@ -89,65 +123,36 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('description')" />
                                 </div>
 
+                                {{-- Galería desactivada temporalmente --}}
+                                {{-- 
                                 @if($tenant->business_type === 'urban')
                                 <div>
                                     <x-input-label :value="__('Añadir a Galería (Opcional)')" />
                                     <input type="file" name="gallery[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-                                    
-                                    @if($product->gallery && count($product->gallery) > 0)
-                                        <div class="mt-4 grid grid-cols-4 gap-2">
-                                            @foreach($product->gallery as $image)
-                                                <div class="aspect-square rounded-md overflow-hidden border">
-                                                    <img src="{{ $image }}" class="w-full h-full object-cover">
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
                                     <x-input-error class="mt-2" :messages="$errors->get('gallery')" />
                                 </div>
                                 @endif
+                                --}}
 
                                 <div x-data="{ 
                                     previewUrl: '{{ $product->image }}', 
                                     fileName: '' 
                                 }">
                                     <x-input-label for="image" :value="__('Imagen del Producto')" />
-                                    
-                                    <!-- Vista Previa -->
                                     <div class="mt-2 mb-4 relative group w-32 h-32">
                                         <template x-if="previewUrl">
-                                            <img :src="previewUrl" class="w-32 h-32 object-cover rounded-lg border-2 border-indigo-100 shadow-md group-hover:opacity-75 transition-all">
+                                            <img :src="previewUrl" class="w-32 h-32 object-cover rounded-lg border-2 border-indigo-100 shadow-md">
                                         </template>
                                         <template x-if="!previewUrl">
-                                            <div class="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                            </div>
+                                            <div class="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 text-gray-400 font-bold text-[8px] uppercase">Sin Foto</div>
                                         </template>
                                     </div>
                                     
-                                    <div class="flex flex-col sm:flex-row gap-2 mt-2">
-                                        <button type="button" @click="$refs.imageInput.setAttribute('capture', 'environment'); $refs.imageInput.click();" class="sm:hidden inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full">
-                                            📸 Usar Cámara
-                                        </button>
-                                        <button type="button" @click="$refs.imageInput.removeAttribute('capture'); $refs.imageInput.click();" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition w-full sm:w-auto">
-                                            📁 Galería / Archivo
-                                        </button>
-                                    </div>
+                                    <button type="button" @click="$refs.imageInput.click();" class="px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase hover:bg-gray-50 transition w-full">
+                                        Seleccionar Imagen
+                                    </button>
                                     
-                                    <input id="image" x-ref="imageInput" name="image" type="file" accept="image/*" class="hidden" 
-                                           @change="
-                                                const file = $event.target.files[0];
-                                                if (file) {
-                                                    fileName = file.name;
-                                                    previewUrl = URL.createObjectURL(file);
-                                                }
-                                           " />
-                                    
-                                    <p x-cloak x-show="fileName" class="mt-2 text-sm text-green-600 font-bold flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                        <span x-text="'Listo: ' + fileName"></span>
-                                    </p>
-                                    
+                                    <input id="image" x-ref="imageInput" name="image" type="file" accept="image/*" class="hidden" @change="const file = $event.target.files[0]; if (file) { previewUrl = URL.createObjectURL(file); }" />
                                     <x-input-error class="mt-2" :messages="$errors->get('image')" />
                                 </div>
 
