@@ -64,8 +64,17 @@
     <!-- Navbar Simple -->
     <nav class="sticky top-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-100 dark:border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <a href="#" class="font-bold text-xl tracking-tight uppercase border-b-2 border-brand-primary">
-                {{ $tenant->name }}
+            <a href="#" class="font-bold text-xl tracking-tight flex items-center gap-3 group">
+                @if($tenant->logo)
+                    <div class="h-10 bg-white dark:bg-zinc-900 rounded-lg p-1 border border-gray-100 dark:border-zinc-800 shadow-sm flex items-center justify-center transition-all group-hover:border-brand-primary">
+                        <img src="{{ $tenant->logo }}" alt="{{ $tenant->name }}" class="h-full w-auto object-contain drop-shadow-sm">
+                    </div>
+                @else
+                    <div class="w-10 h-10 rounded-lg bg-brand-primary text-white flex items-center justify-center text-lg font-black shadow-md border border-white/20">
+                        {{ substr($tenant->name, 0, 1) }}
+                    </div>
+                @endif
+                <span class="uppercase border-b-2 border-transparent group-hover:border-brand-primary transition-colors hidden sm:block">{{ $tenant->name }}</span>
             </a>
 
             <div class="flex items-center gap-3 md:gap-6">
