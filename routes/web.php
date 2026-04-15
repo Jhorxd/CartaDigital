@@ -53,11 +53,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
-Route::get('/instalar-arreglos', function () {
-    app(\Database\Seeders\ArreglosTenantSeeder::class)->run();
-    return '<b>¡Tienda de Arreglos instalada con éxito!</b><br><br>Ya puedes entrar a <a href="http://arreglos.localhost:8000">arreglos.localhost:8000</a> (o el dominio que uses) con el usuario admin@arreglos.test y la clave arreglos123.';
-});
-
 // Rutas de Autenticación Unificadas (Login, Logout, etc.)
 require __DIR__.'/auth.php';
