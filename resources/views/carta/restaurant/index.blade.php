@@ -183,12 +183,12 @@
 
     <!-- Sticky Tabs Navigation con Indicador de Scroll -->
     <div class="sticky top-0 z-40 relative group/tabs">
-        <!-- Gradientes laterales -->
-        <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-gray-50 dark:from-black to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity"></div>
-        <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-gray-50 dark:from-black to-transparent z-10 pointer-events-none"></div>
+        <!-- Gradientes laterales (Solo Móvil) -->
+        <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-gray-50 dark:from-black to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity md:hidden"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-gray-50 dark:from-black to-transparent z-10 pointer-events-none md:hidden"></div>
         
-        <!-- Flecha Indicadora -->
-        <div class="absolute right-4 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal">
+        <!-- Flecha Indicadora (Solo Móvil) -->
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal md:hidden">
             <svg class="w-5 h-5 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
         </div>
 

@@ -113,12 +113,12 @@
                 <h2 class="text-xs uppercase tracking-[0.4em] text-gray-400 dark:text-white/40 mb-8 font-medium">Nuestras Galerías</h2>
                 <!-- Galería de Categorías con Indicadores -->
                 <div class="w-full relative group/tabs">
-                    <!-- Gradientes laterales de lujo -->
-                    <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity"></div>
-                    <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none"></div>
+                    <!-- Gradientes laterales de lujo (Solo Móvil) -->
+                    <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity md:hidden"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none md:hidden"></div>
                     
-                    <!-- Flecha Indicadora Elegante -->
-                    <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal">
+                    <!-- Flecha Indicadora Elegante (Solo Móvil) -->
+                    <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal md:hidden">
                         <svg class="w-5 h-5 text-brand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
                     </div>
 

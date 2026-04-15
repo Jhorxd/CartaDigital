@@ -122,12 +122,12 @@
         
         <!-- Tabs Compactas con Indicador de Scroll -->
         <div class="relative mb-10 group/tabs">
-            <!-- Gradientes laterales para indicar scroll -->
-            <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white dark:from-black to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity"></div>
-            <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white dark:from-black to-transparent z-10 pointer-events-none"></div>
+            <!-- Gradientes laterales para indicar scroll (Solo Móvil) -->
+            <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white dark:from-black to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity md:hidden"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white dark:from-black to-transparent z-10 pointer-events-none md:hidden"></div>
             
-            <!-- Flecha Indicadora Animada -->
-            <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal">
+            <!-- Flecha Indicadora Animada (Solo Móvil) -->
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal md:hidden">
                 <svg class="w-4 h-4 text-brand-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
             </div>
 
