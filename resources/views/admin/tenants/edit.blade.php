@@ -40,6 +40,7 @@
                                 <select id="business_type" name="business_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                                     <option value="restaurant" {{ old('business_type', $tenant->business_type) == 'restaurant' ? 'selected' : '' }}>Restaurante / Cafetería / Comida</option>
                                     <option value="boutique" {{ old('business_type', $tenant->business_type) == 'boutique' ? 'selected' : '' }}>Boutique / Perfumería / Ropa</option>
+                                    <option value="urban" {{ old('business_type', $tenant->business_type) == 'urban' ? 'selected' : '' }}>Urbano / Zapatillas</option>
                                 </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('business_type')" />
                             </div>
