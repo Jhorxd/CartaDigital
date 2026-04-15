@@ -27,6 +27,7 @@ class SettingsController extends Controller
             'whatsapp'     => 'nullable|string|max:20',
             'schedule'     => 'nullable|string|max:255',
             'brand_color'  => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'theme'        => 'nullable|in:auto,light,dark,split,split_dark',
             'logo'         => 'nullable|image|max:2048',
             'cover_image'  => 'nullable|image|max:4096',
         ]);

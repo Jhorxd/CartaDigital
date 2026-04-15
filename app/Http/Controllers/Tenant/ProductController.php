@@ -45,25 +45,50 @@ class ProductController extends Controller
             'categories' => 'required|array',
             'categories.*' => 'exists:categories,id',
             'name' => 'required|string|max:255',
+            'brand' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'old_price' => 'nullable|numeric|min:0',
+            'sizes' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:2048',
+            'badge' => 'nullable|string|max:50',
             'is_active' => 'boolean',
             'order_position' => 'nullable|integer',
         ]);
 
+        if ($request->filled('sizes')) {
+            $validated['sizes'] = array_map('trim', explode(',', $request->sizes));
+        } else {
+            $validated['sizes'] = null;
+        }
+
+        $manager = new ImageManager(new Driver());
+
+        // Imagen principal
         if ($request->hasFile('image')) {
-            $manager = new ImageManager(new Driver());
             $imageFile = $request->file('image');
             $filename = Str::random(40) . '.webp';
-            
-            // Procesar imagen: redimensionar a 800px de ancho y convertir a WebP
             $image = $manager->decode($imageFile->getPathname());
             $image->scale(width: 800);
             $encoded = $image->encodeUsingFileExtension('webp', quality: 75);
-            
             Storage::disk('public')->put('products/' . $filename, (string) $encoded);
             $validated['image'] = Storage::url('products/' . $filename);
+        }
+
+        // Galería de imágenes
+        if ($request->hasFile('gallery')) {
+            $galleryUrls = [];
+            foreach ($request->file('gallery') as $file) {
+                $filename = Str::random(40) . '.webp';
+                $img = $manager->decode($file->getPathname());
+                $img->scale(width: 800);
+                $encoded = $img->encodeUsingFileExtension('webp', quality: 75);
+                Storage::disk('public')->put('products/gallery/' . $filename, (string) $encoded);
+                $galleryUrls[] = Storage::url('products/gallery/' . $filename);
+            }
+            $validated['gallery'] = $galleryUrls;
         }
 
         $categories = $validated['categories'];
@@ -88,12 +113,26 @@ class ProductController extends Controller
             'categories' => 'required|array',
             'categories.*' => 'exists:categories,id',
             'name' => 'required|string|max:255',
+            'brand' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'old_price' => 'nullable|numeric|min:0',
+            'sizes' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:2048',
+            'badge' => 'nullable|string|max:50',
             'is_active' => 'boolean',
             'order_position' => 'nullable|integer',
         ]);
+
+        if ($request->filled('sizes')) {
+            $validated['sizes'] = array_map('trim', explode(',', $request->sizes));
+        } else {
+            $validated['sizes'] = null;
+        }
+
+        $manager = new ImageManager(new Driver());
 
         if ($request->hasFile('image')) {
             // Eliminar imagen anterior si existe localmente
@@ -102,17 +141,27 @@ class ProductController extends Controller
                 Storage::delete($oldPath);
             }
 
-            $manager = new ImageManager(new Driver());
             $imageFile = $request->file('image');
             $filename = Str::random(40) . '.webp';
-            
-            // Procesar imagen: redimensionar a 800px de ancho y convertir a WebP
             $image = $manager->decode($imageFile->getPathname());
             $image->scale(width: 800);
             $encoded = $image->encodeUsingFileExtension('webp', quality: 75);
-            
             Storage::disk('public')->put('products/' . $filename, (string) $encoded);
             $validated['image'] = Storage::url('products/' . $filename);
+        }
+
+        // Galería de imágenes (añadir a las existentes o reemplazar)
+        if ($request->hasFile('gallery')) {
+            $galleryUrls = $product->gallery ?? [];
+            foreach ($request->file('gallery') as $file) {
+                $filename = Str::random(40) . '.webp';
+                $img = $manager->decode($file->getPathname());
+                $img->scale(width: 800);
+                $encoded = $img->encodeUsingFileExtension('webp', quality: 75);
+                Storage::disk('public')->put('products/gallery/' . $filename, (string) $encoded);
+                $galleryUrls[] = Storage::url('products/gallery/' . $filename);
+            }
+            $validated['gallery'] = $galleryUrls;
         }
 
         $categories = $validated['categories'];

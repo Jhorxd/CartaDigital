@@ -40,21 +40,47 @@
         .dark .luxury-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(205, 162, 94, 0.1); }
         .light .luxury-card { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .light .luxury-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 20px rgba(205, 162, 94, 0.2); }
+
+        /* === SPLIT: Cabecera blanca fija, body oscuro === */
+        .nav-force-light {
+            background-color: #ffffff !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-bottom-color: rgba(229, 231, 235, 1) !important;
+        }
+        /* Solo el título y textos de la nav — el logo (img/letra) NO se toca */
+        .nav-force-light .nav-text  { color: #111827 !important; }
+        .nav-force-light .nav-subtitle { color: var(--brand-color) !important; }
+        .nav-force-light .nav-meta-text { color: #6b7280 !important; }
+        .nav-force-light .nav-gradient-line { opacity: 0.35 !important; }
+
+        /* === SPLIT DARK: Cabecera negra fija, body claro === */
+        .nav-force-dark {
+            background-color: rgba(10,10,10,0.97) !important;
+            border-bottom-color: rgba(39, 39, 42, 1) !important;
+        }
+        .nav-force-dark .nav-text  { color: #f9fafb !important; }
+        .nav-force-dark .nav-subtitle { color: var(--brand-color) !important; }
+        .nav-force-dark .nav-meta-text { color: rgba(255,255,255,0.5) !important; }
+        .nav-force-dark .nav-gradient-line { opacity: 0.5 !important; }
     </style>
 </head>
 <body class="antialiased min-h-screen relative font-sans transition-colors duration-500 selection:bg-brand selection:text-white bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-white pb-24" x-data="cartManager">
 
-    <!-- Theme Switcher -->
+    <!-- Theme Switcher: visible en modo auto, split y split_dark para alternar el body -->
+    @if(empty($tenant->theme) || in_array($tenant->theme, ['auto', 'split', 'split_dark']))
     <div class="fixed top-6 right-6 z-50">
-        <button @click="toggleTheme" class="p-3.5 rounded-full glass shadow-xl hover:scale-110 active:scale-95 transition-all text-gray-800 dark:text-white">
+        <button @click="toggleTheme" class="p-3.5 rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all
+            {{ $tenant->theme === 'split_dark' ? 'bg-zinc-900/80 border border-white/10 text-white' : 'glass text-gray-800 dark:text-white' }}">
             <template x-if="!darkMode">
-                <svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             </template>
             <template x-if="darkMode">
-                <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.071 16.071l.707.707M7.757 7.757l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.071 16.071l.707.707M7.757 7.757l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
             </template>
         </button>
     </div>
+    @endif
 
     <!-- Atmospheric Background Blur -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden z-[-1]">
@@ -63,32 +89,40 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-40 bg-white/70 dark:bg-black/60 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-all duration-300 relative">
+    @php
+        $navClass = match($tenant->theme ?? 'auto') {
+            'split'      => 'nav-force-light',
+            'split_dark' => 'nav-force-dark',
+            default      => 'bg-white/70 dark:bg-black/60 border-gray-200 dark:border-white/5',
+        };
+    @endphp
+    <nav class="sticky top-0 z-40 backdrop-blur-xl border-b transition-all duration-300 relative {{ $navClass }}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-24">
                 <div class="flex items-center gap-6">
+                    {{-- Logo: las clases son independientes, el CSS split NO las toca --}}
                     @if($tenant->logo)
                         <img src="{{ $tenant->logo }}" alt="{{ $tenant->name }}" class="h-14 w-auto object-contain">
                     @else
-                        <div class="h-12 w-12 rounded-sm border md:border-2 border-brand/40 dark:border-brand/50 flex items-center justify-center text-brand font-serif font-bold text-2xl shadow-[0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_15px_rgba(205,162,94,0.2)]">
+                        <div class="h-12 w-12 rounded-sm border-2 border-brand/40 flex items-center justify-center text-brand font-serif font-bold text-2xl">
                             {{ substr($tenant->name, 0, 1) }}
                         </div>
                     @endif
                     <div>
-                        <h1 class="text-xl md:text-3xl font-serif font-bold tracking-widest text-gray-900 dark:text-white uppercase">{{ $tenant->name }}</h1>
-                        <p class="text-[9px] md:text-xs text-brand uppercase tracking-[0.3em] font-medium mt-1">Colección Exclusiva</p>
+                        <h1 class="nav-text text-xl md:text-3xl font-serif font-bold tracking-widest uppercase text-gray-900 dark:text-white">{{ $tenant->name }}</h1>
+                        <p class="nav-subtitle text-[9px] md:text-xs text-brand uppercase tracking-[0.3em] font-medium mt-1">Colección Exclusiva</p>
                     </div>
                 </div>
                 
                 @if($tenant->address || $tenant->schedule)
                 <div class="hidden lg:flex flex-col items-end opacity-70 text-xs font-light tracking-wide space-y-1">
-                    @if($tenant->address) <span>{{ $tenant->address }}</span> @endif
-                    @if($tenant->schedule) <span class="text-brand">{{ $tenant->schedule }}</span> @endif
+                    @if($tenant->address) <span class="nav-meta-text">{{ $tenant->address }}</span> @endif
+                    @if($tenant->schedule) <span class="nav-subtitle">{{ $tenant->schedule }}</span> @endif
                 </div>
                 @endif
             </div>
         </div>
-        <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-brand to-transparent opacity-30 dark:opacity-50 absolute bottom-0"></div>
+        <div class="nav-gradient-line h-[1px] w-full bg-gradient-to-r from-transparent via-brand to-transparent opacity-30 dark:opacity-50 absolute bottom-0"></div>
     </nav>
 
     <!-- Main Content -->
@@ -97,7 +131,7 @@
         <!-- Search Bar -->
         <div class="mb-12 max-w-lg mx-auto">
             <div class="relative">
-                <input type="text" x-model="searchQuery" placeholder="Buscar perfumes..." class="w-full bg-white/50 dark:bg-black/30 border border-brand/20 focus:border-brand/80 rounded-full px-6 py-4 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1 focus:ring-brand shadow-sm backdrop-blur-md transition-all">
+                <input type="text" x-model="searchQuery" placeholder="Buscar..." class="w-full bg-white/50 dark:bg-black/30 border border-brand/20 focus:border-brand/80 rounded-full px-6 py-4 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1 focus:ring-brand shadow-sm backdrop-blur-md transition-all">
                 <div class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-brand">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
@@ -111,19 +145,40 @@
             <!-- Elegant Tabs -->
             <div class="mb-16 flex flex-col items-center" x-show="searchQuery === ''" x-transition>
                 <h2 class="text-xs uppercase tracking-[0.4em] text-gray-400 dark:text-white/40 mb-8 font-medium">Nuestras Galerías</h2>
-                <div class="w-full overflow-x-auto hide-scrollbar">
-                    <div class="flex gap-4 md:gap-8 justify-start md:justify-center whitespace-nowrap min-w-max px-2 border-b border-gray-200 dark:border-white/10">
-                        @foreach($categories as $category)
-                            <button 
-                                @click="activeTab = {{ $category->id }}"
-                                class="relative pb-4 text-sm md:text-base tracking-[0.1em] uppercase font-bold transition-all duration-300 focus:outline-none"
-                                :class="activeTab === {{ $category->id }} ? 'text-brand' : 'text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white/80'"
-                            >
-                                {{ $category->name }}
-                                <div class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-brand transform origin-left transition-transform duration-300"
-                                     :class="activeTab === {{ $category->id }} ? 'scale-x-100' : 'scale-x-0'"></div>
-                            </button>
-                        @endforeach
+                <!-- Galería de Categorías con Indicadores -->
+                <div class="w-full relative group/tabs">
+                    <!-- Gradientes laterales de lujo (Solo Móvil) -->
+                    <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity md:hidden"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none md:hidden"></div>
+                    
+                    <!-- Flecha Indicadora Elegante (Solo Móvil) -->
+                    <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce-horizontal md:hidden">
+                        <svg class="w-5 h-5 text-brand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 7l5 5-5 5"></path></svg>
+                    </div>
+
+                    <style>
+                        @keyframes bounce-horizontal {
+                            0%, 100% { transform: translate(-25%, -50%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+                            50% { transform: translate(0, -50%); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+                        }
+                        .animate-bounce-horizontal { animation: bounce-horizontal 1s infinite; }
+                    </style>
+
+                    <div class="overflow-x-auto hide-scrollbar"
+                         x-init="$el.scrollTo({left: 40, behavior: 'smooth'}); setTimeout(() => $el.scrollTo({left: 0, behavior: 'smooth'}), 600)">
+                        <div class="flex gap-4 md:gap-8 justify-start md:justify-center whitespace-nowrap min-w-max px-8 border-b border-gray-200 dark:border-white/10">
+                            @foreach($categories as $category)
+                                <button 
+                                    @click="activeTab = {{ $category->id }}"
+                                    class="relative pb-4 text-sm md:text-base tracking-[0.1em] uppercase font-bold transition-all duration-300 focus:outline-none"
+                                    :class="activeTab === {{ $category->id }} ? 'text-brand' : 'text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white/80'"
+                                >
+                                    {{ $category->name }}
+                                    <div class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-brand transform origin-left transition-transform duration-300"
+                                         :class="activeTab === {{ $category->id }} ? 'scale-x-100' : 'scale-x-0'"></div>
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
@@ -368,13 +423,32 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('themeManager', () => ({
-                darkMode: localStorage.getItem('darkMode') ? localStorage.getItem('darkMode') === 'true' : true,
-                toggleTheme() {
-                    this.darkMode = !this.darkMode;
-                    localStorage.setItem('darkMode', this.darkMode);
+            Alpine.data('themeManager', () => {
+                const tenantTheme = '{{ $tenant->theme ?? "auto" }}';
+                let initialDarkMode = true;
+                
+                if (tenantTheme === 'dark' || tenantTheme === 'split') {
+                    // body oscuro fijo (split: nav escapa via CSS nav-force-light)
+                    initialDarkMode = true;
+                } else if (tenantTheme === 'light' || tenantTheme === 'split_dark') {
+                    // body claro fijo (split_dark: nav escapa via CSS nav-force-dark)
+                    initialDarkMode = false;
+                } else {
+                    // auto: respeta preferencia guardada del navegador
+                    initialDarkMode = localStorage.getItem('darkMode') ? localStorage.getItem('darkMode') === 'true' : true;
                 }
-            }));
+
+                return {
+                    darkMode: initialDarkMode,
+                    themeSetting: tenantTheme,
+                    toggleTheme() {
+                        // light y dark son fijos, no se pueden alternar
+                        if (tenantTheme === 'light' || tenantTheme === 'dark') return;
+                        this.darkMode = !this.darkMode;
+                        localStorage.setItem('darkMode', this.darkMode);
+                    }
+                };
+            });
 
             Alpine.data('cartManager', () => ({
                 cart: [],

@@ -20,6 +20,7 @@ class Tenant extends Model
         'brand_color',
         'is_active',
         'business_type',
+        'theme',
     ];
 
     public function owner()

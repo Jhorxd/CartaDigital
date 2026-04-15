@@ -36,17 +36,49 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('name')" />
                                 </div>
 
+                                @if($tenant->business_type === 'urban')
                                 <div>
-                                    <x-input-label for="price" :value="__('Precio (S/)')" />
-                                    <x-text-input id="price" name="price" type="number" step="0.01" class="mt-1 block w-full" :value="old('price', $product->price)" required />
-                                    <x-input-error class="mt-2" :messages="$errors->get('price')" />
+                                    <x-input-label for="brand" :value="__('Marca (Opcional)')" />
+                                    <x-text-input id="brand" name="brand" type="text" class="mt-1 block w-full" :value="old('brand', $product->brand)" placeholder="Ej: Nike, Adidas, Jordan" />
+                                    <x-input-error class="mt-2" :messages="$errors->get('brand')" />
+                                </div>
+                                @endif
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <x-input-label for="price" :value="__('Precio Actual (S/)')" />
+                                        <x-text-input id="price" name="price" type="number" step="0.01" class="mt-1 block w-full" :value="old('price', $product->price)" required />
+                                        <x-input-error class="mt-2" :messages="$errors->get('price')" />
+                                    </div>
+                                    @if($tenant->business_type === 'urban')
+                                    <div>
+                                        <x-input-label for="old_price" :value="__('Precio Anterior (Opcional)')" />
+                                        <x-text-input id="old_price" name="old_price" type="number" step="0.01" class="mt-1 block w-full border-red-200" :value="old('old_price', $product->old_price)" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('old_price')" />
+                                    </div>
+                                    @endif
+                                </div>
+
+                                @if($tenant->business_type === 'urban')
+                                <div>
+                                    <x-input-label for="badge" :value="__('Etiqueta / Badge')" />
+                                    <select id="badge" name="badge" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="">Ninguna</option>
+                                        <option value="Nuevo" {{ old('badge', $product->badge) == 'Nuevo' ? 'selected' : '' }}>Nuevo</option>
+                                        <option value="Oferta" {{ old('badge', $product->badge) == 'Oferta' ? 'selected' : '' }}>Oferta</option>
+                                        <option value="Top Sell" {{ old('badge', $product->badge) == 'Top Sell' ? 'selected' : '' }}>Top Sell</option>
+                                        <option value="Limitado" {{ old('badge', $product->badge) == 'Limitado' ? 'selected' : '' }}>Edición Limitada</option>
+                                    </select>
+                                    <x-input-error class="mt-2" :messages="$errors->get('badge')" />
                                 </div>
 
                                 <div>
-                                    <x-input-label for="order_position" :value="__('Orden')" />
-                                    <x-text-input id="order_position" name="order_position" type="number" class="mt-1 block w-full" :value="old('order_position', $product->order_position)" />
-                                    <x-input-error class="mt-2" :messages="$errors->get('order_position')" />
+                                    <x-input-label for="sizes" :value="__('Tallas Disponibles')" />
+                                    <x-text-input id="sizes" name="sizes" type="text" class="mt-1 block w-full" :value="old('sizes', is_array($product->sizes) ? implode(', ', $product->sizes) : '')" placeholder="Ej: 38, 39, 40, 42" />
+                                    <p class="mt-1 text-xs text-gray-500 italic">Separa las tallas por comas.</p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('sizes')" />
                                 </div>
+                                @endif
                             </div>
 
                             <!-- Col Derecha -->
@@ -56,6 +88,24 @@
                                     <textarea id="description" name="description" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('description', $product->description) }}</textarea>
                                     <x-input-error class="mt-2" :messages="$errors->get('description')" />
                                 </div>
+
+                                @if($tenant->business_type === 'urban')
+                                <div>
+                                    <x-input-label :value="__('Añadir a Galería (Opcional)')" />
+                                    <input type="file" name="gallery[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                    
+                                    @if($product->gallery && count($product->gallery) > 0)
+                                        <div class="mt-4 grid grid-cols-4 gap-2">
+                                            @foreach($product->gallery as $image)
+                                                <div class="aspect-square rounded-md overflow-hidden border">
+                                                    <img src="{{ $image }}" class="w-full h-full object-cover">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    <x-input-error class="mt-2" :messages="$errors->get('gallery')" />
+                                </div>
+                                @endif
 
                                 <div x-data="{ 
                                     previewUrl: '{{ $product->image }}', 
