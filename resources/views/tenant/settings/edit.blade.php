@@ -93,7 +93,8 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('logo')" />
                                 </div>
 
-                                {{-- Imagen de Portada --}}
+                                {{-- Imagen de Portada: solo para restaurantes (la boutique no usa portada) --}}
+                                @if($tenant->business_type !== 'boutique')
                                 <div x-data="{ previewUrl: '{{ $tenant->cover_image }}', fileName: '' }">
                                     <x-input-label for="cover_image" :value="__('Imagen de Portada (Banner)')" />
                                     <p class="text-xs text-gray-500 mb-2">Es la foto grande que aparece en la parte superior de tu carta digital. Recomendado: foto de tu local o tus platos.</p>
@@ -132,6 +133,7 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('cover_image')" />
                                     <p class="text-[10px] text-gray-400 mt-1.5">Máx. 4MB · Se optimizará automáticamente a formato WebP</p>
                                 </div>
+                                @endif
 
                                 {{-- Color de Marca --}}
                                 <div x-data="{ color: '{{ old('brand_color', $tenant->brand_color ?? '#f97316') }}' }">
