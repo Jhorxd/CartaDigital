@@ -165,6 +165,22 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('brand_color')" />
                                 </div>
 
+                                {{-- Tema Visible (Boutique) --}}
+                                @if(isset($tenant->business_type) && $tenant->business_type === 'boutique')
+                                <div class="mt-4">
+                                    <x-input-label for="theme" :value="__('Modo de Visualización (Tema)')" />
+                                    <p class="text-xs text-gray-500 mb-2">Define cómo se mostrará la interfaz a tus clientes.</p>
+                                    <select id="theme" name="theme" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="auto" {{ (old('theme', $tenant->theme ?? 'auto') == 'auto') ? 'selected' : '' }}>🔄 Automático (el cliente elige con botón)</option>
+                                        <option value="light" {{ (old('theme', $tenant->theme) == 'light') ? 'selected' : '' }}>☀️ Fijo: Todo en Modo Claro</option>
+                                        <option value="dark" {{ (old('theme', $tenant->theme) == 'dark') ? 'selected' : '' }}>🌑 Fijo: Todo en Modo Oscuro</option>
+                                        <option value="split" {{ (old('theme', $tenant->theme) == 'split') ? 'selected' : '' }}>🎭 Split: Cabecera Blanca + Cuerpo Oscuro</option>
+                                        <option value="split_dark" {{ (old('theme', $tenant->theme) == 'split_dark') ? 'selected' : '' }}>🌓 Split Inverso: Cabecera Negra + Cuerpo Claro</option>
+                                    </select>
+                                    <x-input-error class="mt-2" :messages="$errors->get('theme')" />
+                                </div>
+                                @endif
+
                                 {{-- Subdominio --}}
                                 <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100 mt-4">
                                     <h4 class="text-indigo-800 font-bold text-sm mb-1">Tu Subdominio actual</h4>
