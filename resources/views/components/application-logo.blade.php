@@ -8,9 +8,11 @@
 @if($tenant)
     <div {{ $attributes->merge(['class' => 'flex items-center gap-3']) }}>
         @if($tenant->logo)
-            <img src="{{ $tenant->logo }}" class="{{ $isCompact ? 'h-10 w-10' : 'h-24 w-24' }} object-cover rounded-xl shadow-md" alt="{{ $tenant->name }}">
+            <div class="{{ $isCompact ? 'h-10 w-10' : 'h-24 w-24' }} shrink-0 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 p-1 flex items-center justify-center">
+                <img src="{{ $tenant->logo }}" class="max-w-full max-h-full object-contain" alt="{{ $tenant->name }}">
+            </div>
         @else
-            <div class="{{ $isCompact ? 'h-10 w-10 text-xl' : 'h-24 w-24 text-5xl' }} rounded-xl shadow-lg flex items-center justify-center text-white font-black border-2 border-white/10" style="background-color: var(--brand-color);">
+            <div class="{{ $isCompact ? 'h-10 w-10 text-xl' : 'h-24 w-24 text-5xl' }} shrink-0 rounded-xl shadow-lg flex items-center justify-center text-white font-black border-2 border-white/10" style="background-color: var(--color-primary);">
                 {{ strtoupper(substr($tenant->name, 0, 1)) }}
             </div>
         @endif
