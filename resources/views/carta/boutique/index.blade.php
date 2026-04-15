@@ -43,7 +43,9 @@
 
         /* === SPLIT: Cabecera blanca fija, body oscuro === */
         .nav-force-light {
-            background-color: rgba(255,255,255,0.97) !important;
+            background-color: #ffffff !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             border-bottom-color: rgba(229, 231, 235, 1) !important;
         }
         /* Solo el título y textos de la nav — el logo (img/letra) NO se toca */
