@@ -147,7 +147,7 @@
         
         <div class="flex gap-5 overflow-x-auto hide-scrollbar px-8 pb-4 pr-12">
             @foreach($featured as $product)
-            <div @click="openProductModal({ 
+            <div @click="addToCart({ 
                                     id: {{ $product->id }}, 
                                     name: '{{ addslashes($product->name) }}', 
                                     price: {{ $product->price }}, 
@@ -217,7 +217,7 @@
                 @foreach($category->products as $product)
                 <div x-show="search === '' || '{{ strtolower($product->name) }}'.includes(search.toLowerCase())"
                      @if($product->is_active)
-                     @click.prevent="openProductModal({ 
+                     @click.prevent="addToCart({ 
                                     id: {{ $product->id }}, 
                                     name: '{{ addslashes($product->name) }}', 
                                     price: {{ $product->price }}, 
@@ -286,78 +286,6 @@
         </section>
         @endforeach
     </main>
-
-    <!-- Modal: Añadir producto con indicación -->
-    <div x-cloak x-show="openProductModal"
-         class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center px-4 pb-8 sm:pb-0"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0">
-
-        <!-- Overlay -->
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="openProductModal = false"></div>
-
-        <!-- Modal Card -->
-        <div class="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden"
-             x-transition:enter="transition ease-out duration-300 transform"
-             x-transition:enter-start="translate-y-8 scale-95 opacity-0"
-             x-transition:enter-end="translate-y-0 scale-100 opacity-100"
-             x-transition:leave="transition ease-in duration-200 transform"
-             x-transition:leave-start="translate-y-0 scale-100 opacity-100"
-             x-transition:leave-end="translate-y-8 scale-95 opacity-0">
-
-            <!-- Imagen del producto -->
-            <template x-if="pendingProduct && pendingProduct.image">
-                <div class="h-44 w-full relative overflow-hidden">
-                    <img :src="pendingProduct.image" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent"></div>
-                </div>
-            </template>
-
-            <div class="p-6 pt-4">
-                <!-- Info del producto -->
-                <div class="mb-4">
-                    <h3 class="text-xl font-black text-slate-900 dark:text-white leading-tight" x-text="pendingProduct?.name"></h3>
-                    <p class="text-2xl font-black text-primary tracking-tighter mt-1">
-                        <span class="text-sm font-bold opacity-60">S/</span>
-                        <span x-text="pendingProduct?.price?.toFixed(2)"></span>
-                    </p>
-                </div>
-
-                <!-- Campo de indicación -->
-                <div class="mb-5">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                        📝 Indicación para este plato (opcional)
-                    </label>
-                    <input
-                        type="text"
-                        x-model="pendingNote"
-                        @keydown.enter="confirmAddToCart()"
-                        placeholder="Ej: sin ají, extra queso, sin cebolla..."
-                        class="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-primary/30 rounded-2xl px-4 py-3 text-sm font-semibold focus:outline-none transition-all placeholder:text-gray-300 dark:placeholder:text-slate-600"
-                        x-init="$nextTick(() => { if (openProductModal) $el.focus() })"
-                    >
-                    <p class="text-[10px] text-slate-400 mt-1.5 ml-1">Se enviará junto al pedido por WhatsApp</p>
-                </div>
-
-                <!-- Botones -->
-                <div class="flex gap-3">
-                    <button @click="openProductModal = false"
-                            class="flex-1 h-12 rounded-2xl border-2 border-gray-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-black text-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition active:scale-95">
-                        Cancelar
-                    </button>
-                    <button @click="confirmAddToCart()"
-                            class="flex-[2] h-12 gradient-bg rounded-2xl text-white font-black text-sm shadow-lg shadow-primary/30 active:scale-95 transition flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                        Añadir al pedido
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Floating Cart (Dynamic Island Style) -->
     <div x-cloak x-show="totalItems > 0" 
@@ -447,7 +375,7 @@
                                 <!-- Nota del producto -->
                                 <div class="mt-3" x-show="item.note">
                                     <div class="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl px-3 py-2 border border-amber-100 dark:border-amber-800/30">
-                                        <span class="text-amber-500 text-xs mt-0.5">📝</span>
+                                        <span class="text-amber-500 text-xs mt-0.5">*</span>
                                         <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 leading-relaxed" x-text="item.note"></p>
                                         <button @click="item.note = ''" class="ml-auto text-amber-400 hover:text-amber-600 transition shrink-0">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -457,7 +385,7 @@
                                 <div class="mt-2" x-show="!item.note || item.note === ''">
                                     <button @click="item._editNote = !item._editNote" class="text-[10px] font-black text-slate-400 hover:text-primary transition flex items-center gap-1 uppercase tracking-widest">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                                        Añadir indicación
+                                        Añadir comentario
                                     </button>
                                     <div x-show="item._editNote" x-transition class="mt-2">
                                         <input type="text" 
@@ -545,9 +473,6 @@
                 orderComment: '',
                 activeCategory: '{{ $categories->first()->id ?? 0 }}',
                 openDrawer: false,
-                openProductModal: false,
-                pendingProduct: null,
-                pendingNote: '',
                 search: '',
                 
                 // All products to help with search without full re-render
@@ -557,27 +482,6 @@
                     if (this.search === '') return true;
                     const cat = this.allProducts.find(c => c.id == catId);
                     return cat ? cat.products.some(p => p.includes(this.search.toLowerCase())) : false;
-                },
-                
-                openProductModal(product) {
-                    this.pendingProduct = product;
-                    this.pendingNote = '';
-                    this.openProductModal = true;
-                },
-
-                confirmAddToCart() {
-                    if (!this.pendingProduct) return;
-                    const product = this.pendingProduct;
-                    const existing = this.cart.find(i => i.id === product.id);
-                    if (existing) {
-                        existing.quantity++;
-                        if (this.pendingNote.trim()) existing.note = this.pendingNote.trim();
-                    } else {
-                        this.cart.push({ ...product, quantity: 1, note: this.pendingNote.trim(), _editNote: false, _tempNote: '' });
-                    }
-                    this.openProductModal = false;
-                    this.pendingProduct = null;
-                    this.pendingNote = '';
                 },
 
                 addToCart(product) {
@@ -615,24 +519,24 @@
 
                     // Encabezado del pedido
                     if (this.customerName.trim()) {
-                        message += `🧾 *Pedido para: ${this.customerName.trim()}*\n`;
-                        message += `🏪 {{ $tenant->name }}\n\n`;
+                        message += `*Pedido para: ${this.customerName.trim()}*\n`;
+                        message += `{{ $tenant->name }}\n\n`;
                     } else {
-                        message += `🧾 *Nuevo Pedido - {{ $tenant->name }}*\n\n`;
+                        message += `*Nuevo Pedido - {{ $tenant->name }}*\n\n`;
                     }
 
-                    message += `📋 *Detalle del pedido:*\n`;
+                    message += `*Detalle:*\n`;
                     this.cart.forEach(item => {
-                        message += `\n• ${item.quantity}x *${item.name}* - S/ ${(item.price * item.quantity).toFixed(2)}`;
+                        message += `\n- ${item.quantity}x *${item.name}* - S/ ${(item.price * item.quantity).toFixed(2)}`;
                         if (item.note && item.note.trim()) {
-                            message += `\n  📝 _${item.note.trim()}_`;
+                            message += `\n  _${item.note.trim()}_`;
                         }
                     });
 
-                    message += `\n\n💰 *Total: S/ ${this.totalPrice.toFixed(2)}*`;
+                    message += `\n\n*Total: S/ ${this.totalPrice.toFixed(2)}*`;
 
                     if (this.orderComment.trim()) {
-                        message += `\n\n💬 *Nota:* ${this.orderComment.trim()}`;
+                        message += `\n\n_Nota: ${this.orderComment.trim()}_`;
                     }
 
                     const url = `https://wa.me/{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;

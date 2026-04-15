@@ -312,10 +312,41 @@
                     <p class="text-xl font-serif text-gray-900 dark:text-white">S/ <span x-text="totalPrice.toFixed(2)"></span></p>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Nombre / Dirección</label>
-                    <input type="text" x-model="clientDetails" placeholder="Ej: Juan Perez - Envío a Miraflores..."
-                        class="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-sm px-4 py-3 text-xs font-semibold focus:border-brand focus:ring-0 transition-all text-gray-900 dark:text-white placeholder:text-gray-400">
+                <!-- Campos de entrega -->
+                <div class="space-y-3">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100 dark:border-white/5 pb-2">📦 Datos de Entrega</p>
+
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">👤 Nombre y Apellido</label>
+                        <input type="text" x-model="clientName"
+                            placeholder="Ej: Juan García López"
+                            class="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-sm px-4 py-2.5 text-xs font-semibold focus:border-brand focus:ring-0 transition-all text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-white/20">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">🗺️ Departamento</label>
+                            <select x-model="clientDept"
+                                class="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-sm px-3 py-2.5 text-xs font-semibold focus:border-brand focus:ring-0 transition-all text-gray-900 dark:text-white">
+                                <option value="">Seleccionar...</option>
+                                <option>Amazonas</option><option>Áncash</option><option>Apurímac</option>
+                                <option>Arequipa</option><option>Ayacucho</option><option>Cajamarca</option>
+                                <option>Callao</option><option>Cusco</option><option>Huancavelica</option>
+                                <option>Huánuco</option><option>Ica</option><option>Junín</option>
+                                <option>La Libertad</option><option>Lambayeque</option><option>Lima</option>
+                                <option>Loreto</option><option>Madre de Dios</option><option>Moquegua</option>
+                                <option>Pasco</option><option>Piura</option><option>Puno</option>
+                                <option>San Martín</option><option>Tacna</option><option>Tumbes</option>
+                                <option>Ucayali</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">📍 Distrito</label>
+                            <input type="text" x-model="clientDistrict"
+                                placeholder="Ej: Miraflores"
+                                class="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-sm px-3 py-2.5 text-xs font-semibold focus:border-brand focus:ring-0 transition-all text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-white/20">
+                        </div>
+                    </div>
                 </div>
 
                 <button @click="sendToWhatsApp" class="w-full py-4 bg-brand text-black hover:bg-white transition-all duration-300 text-[11px] uppercase tracking-[0.2em] font-bold text-center rounded-sm shadow-[0_0_20px_rgba(205,162,94,0.2)]">
@@ -347,7 +378,9 @@
 
             Alpine.data('cartManager', () => ({
                 cart: [],
-                clientDetails: '',
+                clientName: '',
+                clientDept: '',
+                clientDistrict: '',
                 openDrawer: false,
                 
                 addToCart(product) {
@@ -381,17 +414,25 @@
                 sendToWhatsApp() {
                     if (this.cart.length === 0) return;
 
-                    let message = `*Nueva Solicitud - {{ $tenant->name }}*\n\n`;
+                    let message = `*Nueva Solicitud - {{ $tenant->name }}*\n`;
+                    message += `--------------------\n\n`;
 
-                    if (this.clientDetails.trim()) {
-                        message += `👤 *Cliente/Envío:* ${this.clientDetails.trim()}\n\n`;
+                    // Datos del cliente
+                    if (this.clientName.trim()) {
+                        message += `*Cliente:* ${this.clientName.trim()}\n`;
+                    }
+                    if (this.clientDept || this.clientDistrict) {
+                        const lugar = [this.clientDept, this.clientDistrict].filter(Boolean).join(' - ');
+                        message += `*Destino:* ${lugar}\n`;
                     }
 
+                    message += `\n*Productos:*\n`;
                     this.cart.forEach(item => {
-                        message += `• ${item.quantity}x ${item.name} - S/ ${(item.price * item.quantity).toFixed(2)}\n`;
+                        message += `- ${item.quantity}x *${item.name}* - S/ ${(item.price * item.quantity).toFixed(2)}\n`;
                     });
-                    
-                    message += `\n*TOTAL:* S/ ${this.totalPrice.toFixed(2)}`;
+
+                    message += `\n--------------------\n`;
+                    message += `*TOTAL: S/ ${this.totalPrice.toFixed(2)}*`;
 
                     const url = `https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;
                     window.open(url, '_blank');
