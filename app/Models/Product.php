@@ -14,11 +14,21 @@ class Product extends Model
         'tenant_id',
         'category_id',
         'name',
+        'brand',
         'description',
         'price',
+        'old_price',
+        'sizes',
+        'gallery',
+        'badge',
         'image',
         'is_active',
         'order_position',
+    ];
+
+    protected $casts = [
+        'sizes' => 'array',
+        'gallery' => 'array',
     ];
 
     public function categories()

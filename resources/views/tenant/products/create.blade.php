@@ -35,11 +35,49 @@
                                     <x-input-error class="mt-2" :messages="$errors->get('name')" />
                                 </div>
 
+                                @if($tenant->business_type === 'urban')
                                 <div>
-                                    <x-input-label for="price" :value="__('Precio (S/)')" />
-                                    <x-text-input id="price" name="price" type="number" step="0.01" class="mt-1 block w-full" :value="old('price')" required />
-                                    <x-input-error class="mt-2" :messages="$errors->get('price')" />
+                                    <x-input-label for="brand" :value="__('Marca (Opcional)')" />
+                                    <x-text-input id="brand" name="brand" type="text" class="mt-1 block w-full" :value="old('brand')" placeholder="Ej: Nike, Adidas, Jordan" />
+                                    <x-input-error class="mt-2" :messages="$errors->get('brand')" />
                                 </div>
+                                @endif
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <x-input-label for="price" :value="__('Precio Actual (S/)')" />
+                                        <x-text-input id="price" name="price" type="number" step="0.01" class="mt-1 block w-full" :value="old('price')" required />
+                                        <x-input-error class="mt-2" :messages="$errors->get('price')" />
+                                    </div>
+                                    @if($tenant->business_type === 'urban')
+                                    <div>
+                                        <x-input-label for="old_price" :value="__('Precio Anterior (Opcional)')" />
+                                        <x-text-input id="old_price" name="old_price" type="number" step="0.01" class="mt-1 block w-full border-red-200" :value="old('old_price')" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('old_price')" />
+                                    </div>
+                                    @endif
+                                </div>
+
+                                @if($tenant->business_type === 'urban')
+                                <div>
+                                    <x-input-label for="badge" :value="__('Etiqueta / Badge')" />
+                                    <select id="badge" name="badge" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="">Ninguna</option>
+                                        <option value="Nuevo" {{ old('badge') == 'Nuevo' ? 'selected' : '' }}>Nuevo</option>
+                                        <option value="Oferta" {{ old('badge') == 'Oferta' ? 'selected' : '' }}>Oferta</option>
+                                        <option value="Top Sell" {{ old('badge') == 'Top Sell' ? 'selected' : '' }}>Top Sell</option>
+                                        <option value="Limitado" {{ old('badge') == 'Limitado' ? 'selected' : '' }}>Edición Limitada</option>
+                                    </select>
+                                    <x-input-error class="mt-2" :messages="$errors->get('badge')" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="sizes" :value="__('Tallas Disponibles')" />
+                                    <x-text-input id="sizes" name="sizes" type="text" class="mt-1 block w-full" :value="old('sizes')" placeholder="Ej: 38, 39, 40, 42" />
+                                    <p class="mt-1 text-xs text-gray-500 italic">Separa las tallas por comas.</p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('sizes')" />
+                                </div>
+                                @endif
                             </div>
 
                             <!-- Col Derecha -->
@@ -49,6 +87,15 @@
                                     <textarea id="description" name="description" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('description') }}</textarea>
                                     <x-input-error class="mt-2" :messages="$errors->get('description')" />
                                 </div>
+
+                                @if($tenant->business_type === 'urban')
+                                <div>
+                                    <x-input-label :value="__('Galería de Imágenes (Opcional)')" />
+                                    <input type="file" name="gallery[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                    <p class="mt-1 text-[10px] text-gray-400">Puedes seleccionar varias fotos a la vez.</p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('gallery')" />
+                                </div>
+                                @endif
 
                                 <div x-data="{ 
                                     previewUrl: '', 
