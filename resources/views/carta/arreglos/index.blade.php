@@ -54,7 +54,7 @@
         .dark .floating-cart { background: white; color: #111827; }
         .floating-cart:hover { transform: scale(1.05); filter: brightness(1.2); }
 
-        .hero-bg { background-image: url('/boutique_flowers_header_1776283190160.png'); background-size: cover; background-position: center; }
+        .hero-bg { background-image: url('{{ $tenant->cover_image ?? "/boutique_flowers_header_1776283190160.png" }}'); background-size: cover; background-position: center; }
 
         .price-badge { background: white; border-radius: 1rem; padding: 6px 16px; box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.05); }
         .dark .price-badge { background: #161616; border-color: rgba(255,255,255,0.1); }
@@ -93,7 +93,14 @@
     <header class="relative h-[45vh] md:h-[55vh] flex items-center justify-center overflow-hidden hero-bg">
         <div class="absolute inset-0 bg-black/50"></div>
         <div class="relative z-10 text-center px-4 max-w-4xl space-y-4">
-            <h2 class="text-5xl md:text-8xl font-serif font-black text-white leading-[0.8] tracking-tighter drop-shadow-2xl"> Arte Floral <br> <span class="text-brand italic font-bold">Boutique</span> </h2>
+            <h2 class="text-5xl md:text-8xl font-serif font-black text-white leading-[0.8] tracking-tighter drop-shadow-2xl"> 
+                @php
+                    $nameParts = explode(' ', $tenant->name);
+                    $firstPart = $nameParts[0] ?? '';
+                    $rest = implode(' ', array_slice($nameParts, 1));
+                @endphp
+                {{ $firstPart }} <br> <span class="text-brand italic font-bold">{{ $rest }}</span> 
+            </h2>
             <div class="flex justify-center"> <div class="h-1 w-20 bg-brand rounded-full my-4 shadow-lg shadow-brand/20"></div> </div>
             <p class="text-white text-[10px] md:text-sm font-bold tracking-[0.5em] uppercase opacity-90">Donde cada pétalo cuenta una historia</p>
         </div>

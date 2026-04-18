@@ -100,21 +100,20 @@
                                     <p class="text-xs text-gray-500 mb-2">Es la foto grande que aparece en la parte superior de tu carta digital. Recomendado: foto de tu local o tus platos.</p>
 
                                     {{-- Preview del banner actual --}}
-                                    <div class="relative w-full h-28 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-gray-100">
+                                    <div @click="$refs.coverInput.click()" class="relative w-full h-32 rounded-xl overflow-hidden border-2 border-dashed border-gray-300 mb-3 bg-gray-50 hover:bg-gray-100 cursor-pointer group transition-all duration-300">
                                         <template x-if="previewUrl">
-                                            <img :src="previewUrl" class="w-full h-full object-cover">
+                                            <img :src="previewUrl" class="w-full h-full object-cover group-hover:opacity-75 transition-opacity">
                                         </template>
                                         <template x-if="!previewUrl">
                                             <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-1">
-                                                <svg class="w-8 h-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                <span class="text-xs font-medium opacity-60">Sin imagen de portada</span>
+                                                <svg class="w-8 h-8 opacity-40 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                <span class="text-xs font-bold uppercase tracking-widest mt-1 opacity-60">Subir Portada</span>
                                             </div>
                                         </template>
                                     </div>
 
                                     <div class="flex items-center gap-3">
-                                        <button type="button" @click="$refs.coverInput.click()" class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md text-sm font-semibold hover:bg-indigo-100 transition whitespace-nowrap">
-                                            {{ $tenant->cover_image ? 'Cambiar Portada' : 'Subir Portada' }}
+                                        <button type="button" @click="$refs.coverInput.click()" class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md text-sm font-semibold hover:bg-indigo-100 transition whitespace-nowrap" x-text="previewUrl ? 'Cambiar Portada' : 'Subir Portada'">
                                         </button>
                                         <p x-cloak x-show="fileName" class="text-xs text-green-600 font-bold truncate flex items-center gap-1">
                                             <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
