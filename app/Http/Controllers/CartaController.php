@@ -24,6 +24,13 @@ class CartaController extends Controller
         if ($tenant->business_type === 'arreglos') {
             return view('carta.arreglos.index', compact('tenant', 'categories'));
         }
+        if ($tenant->business_type === 'gastos') {
+            // El tipo "gastos" no tiene carta pública
+            if (auth()->check()) {
+                return redirect()->route('tenant.admin.dashboard');
+            }
+            return redirect()->route('login');
+        }
 
         return view('carta.restaurant.index', compact('tenant', 'categories'));
     }

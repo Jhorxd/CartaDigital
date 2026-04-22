@@ -13,15 +13,28 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex text-slate-800">
                     @if(app()->has('tenant_id'))
+                        @php $currentTenant = request()->get('tenant'); @endphp
                         <x-nav-link :href="route('tenant.admin.dashboard')" :active="request()->routeIs('tenant.admin.dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('tenant.admin.categories.index')" :active="request()->routeIs('tenant.admin.categories.*')">
-                            {{ __('Categorías') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('tenant.admin.products.index')" :active="request()->routeIs('tenant.admin.products.*')">
-                            {{ __('Productos') }}
-                        </x-nav-link>
+                        @if(isset($currentTenant) && $currentTenant->business_type === 'gastos')
+                            <x-nav-link :href="route('tenant.admin.incomes.index')" :active="request()->routeIs('tenant.admin.incomes.*')">
+                                {{ __('💰 Ingresos') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('tenant.admin.expenses.index')" :active="request()->routeIs('tenant.admin.expenses.*')">
+                                {{ __('💸 Gastos') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('tenant.admin.expenses.report')" :active="request()->routeIs('tenant.admin.expenses.report') || request()->routeIs('tenant.admin.incomes.report')">
+                                {{ __('📊 Reportes') }}
+                            </x-nav-link>
+                        @else
+                            <x-nav-link :href="route('tenant.admin.categories.index')" :active="request()->routeIs('tenant.admin.categories.*')">
+                                {{ __('Categorías') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('tenant.admin.products.index')" :active="request()->routeIs('tenant.admin.products.*')">
+                                {{ __('Productos') }}
+                            </x-nav-link>
+                        @endif
                         <x-nav-link :href="route('tenant.admin.settings.edit')" :active="request()->routeIs('tenant.admin.settings.*')">
                             {{ __('Mi Local') }}
                         </x-nav-link>
@@ -83,15 +96,28 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @if(app()->has('tenant_id'))
+                @php $currentTenant = request()->get('tenant'); @endphp
                 <x-responsive-nav-link :href="route('tenant.admin.dashboard')" :active="request()->routeIs('tenant.admin.dashboard')">
                     {{ __('🏠 Dashboard') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('tenant.admin.categories.index')" :active="request()->routeIs('tenant.admin.categories.*')">
-                    {{ __('📂 Categorías') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('tenant.admin.products.index')" :active="request()->routeIs('tenant.admin.products.*')">
-                    {{ __('📦 Productos') }}
-                </x-responsive-nav-link>
+                @if(isset($currentTenant) && $currentTenant->business_type === 'gastos')
+                    <x-responsive-nav-link :href="route('tenant.admin.incomes.index')" :active="request()->routeIs('tenant.admin.incomes.*')">
+                        {{ __('💰 Ingresos') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('tenant.admin.expenses.index')" :active="request()->routeIs('tenant.admin.expenses.*')">
+                        {{ __('💸 Gastos') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('tenant.admin.expenses.report')" :active="request()->routeIs('tenant.admin.expenses.report') || request()->routeIs('tenant.admin.incomes.report')">
+                        {{ __('📊 Reportes') }}
+                    </x-responsive-nav-link>
+                @else
+                    <x-responsive-nav-link :href="route('tenant.admin.categories.index')" :active="request()->routeIs('tenant.admin.categories.*')">
+                        {{ __('📂 Categorías') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('tenant.admin.products.index')" :active="request()->routeIs('tenant.admin.products.*')">
+                        {{ __('📦 Productos') }}
+                    </x-responsive-nav-link>
+                @endif
                 <x-responsive-nav-link :href="route('tenant.admin.settings.edit')" :active="request()->routeIs('tenant.admin.settings.*')">
                     {{ __('⚙️ Mi Local') }}
                 </x-responsive-nav-link>

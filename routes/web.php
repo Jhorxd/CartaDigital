@@ -24,6 +24,18 @@ Route::domain('{tenant}.' . $domain)->group(function () {
         Route::resource('categories', \App\Http\Controllers\Tenant\CategoryController::class);
         Route::resource('products', \App\Http\Controllers\Tenant\ProductController::class);
         
+        // Gastos
+        Route::get('/expenses/report', [\App\Http\Controllers\Tenant\ExpenseController::class, 'report'])->name('expenses.report');
+        Route::get('/expenses/quick', [\App\Http\Controllers\Tenant\ExpenseController::class, 'quickEntry'])->name('expenses.quick');
+        Route::post('/expenses/bulk', [\App\Http\Controllers\Tenant\ExpenseController::class, 'bulkStore'])->name('expenses.bulk');
+        Route::resource('expenses', \App\Http\Controllers\Tenant\ExpenseController::class);
+
+        // Ingresos
+        Route::get('/incomes/report', [\App\Http\Controllers\Tenant\IncomeController::class, 'report'])->name('incomes.report');
+        Route::get('/incomes/quick', [\App\Http\Controllers\Tenant\IncomeController::class, 'quickEntry'])->name('incomes.quick');
+        Route::post('/incomes/bulk', [\App\Http\Controllers\Tenant\IncomeController::class, 'bulkStore'])->name('incomes.bulk');
+        Route::resource('incomes', \App\Http\Controllers\Tenant\IncomeController::class);
+        
         Route::get('/settings', [\App\Http\Controllers\Tenant\SettingsController::class, 'edit'])->name('settings.edit');
         Route::patch('/settings', [\App\Http\Controllers\Tenant\SettingsController::class, 'update'])->name('settings.update');
     });
