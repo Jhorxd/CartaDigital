@@ -15,6 +15,13 @@
                 </p>
             </div>
             <div class="flex items-center gap-3">
+                @if($currentTenant->business_type === 'gastos')
+                    <form action="{{ route('tenant.admin.dashboard') }}" method="GET" class="flex items-center gap-2">
+                        <input type="month" name="month" value="{{ $stats['selected_month'] ?? now()->format('Y-m') }}" 
+                               onchange="this.form.submit()"
+                               class="border-slate-200 bg-white rounded-xl text-xs font-black uppercase tracking-widest focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2 shadow-sm">
+                    </form>
+                @endif
                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-tighter">
                     {{ now()->format('d M, Y') }}
                 </span>
@@ -36,7 +43,7 @@
                     
                     <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                         <div class="lg:col-span-7 space-y-4">
-                            <h3 class="text-emerald-400 font-black uppercase tracking-[0.2em] text-xs">Estado de Resultados Mensual</h3>
+                            <h3 class="text-emerald-400 font-black uppercase tracking-[0.2em] text-xs">Estado de Resultados: {{ date('M Y', strtotime($stats['selected_month'] ?? now())) }}</h3>
                             <div class="flex items-baseline gap-2">
                                 <span class="text-5xl md:text-7xl font-black tracking-tighter">S/ {{ number_format($stats['balance_month'], 2) }}</span>
                                 <span class="text-xl text-emerald-400/80 font-bold">Balance</span>
