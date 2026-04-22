@@ -59,7 +59,7 @@
 
                                 {{-- Logo --}}
                                 <div x-data="{ previewUrl: '{{ $tenant->logo }}', fileName: '' }">
-                                    <x-input-label for="logo" :value="__('Logo del Restaurante')" />
+                                    <x-input-label for="logo" :value="__('Logo del Negocio')" />
                                     <div class="mt-2 flex items-center gap-4">
                                         
                                         <div class="relative group w-20 h-20 flex-shrink-0">
@@ -220,7 +220,7 @@
                                 <a href="{{ $cartaUrl }}" target="_blank" class="text-indigo-600 font-mono text-sm hover:underline">{{ $cartaUrl }}</a>
                             </div>
                             <p class="text-xs text-gray-500 leading-relaxed">
-                                📌 <strong>Tip:</strong> Imprime este código y colócalo en cada mesa de tu restaurante. Tus clientes podrán escanear y ver tu menú al instante, sin descargar ninguna app.
+                                📌 <strong>Tip:</strong> Imprime este código y colócalo en tu negocio. Tus clientes podrán escanearlo y acceder al instante, sin descargar ninguna app.
                             </p>
                             <a href="{{ $qrDownloadUrl }}"
                                download="QR-{{ $tenant->subdomain }}.png"
