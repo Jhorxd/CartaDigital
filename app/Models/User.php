@@ -14,7 +14,7 @@ use App\Traits\BelongsToTenant;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable; //, BelongsToTenant;
+    use HasFactory, Notifiable, BelongsToTenant;
 
     protected $fillable = [
         'name',
