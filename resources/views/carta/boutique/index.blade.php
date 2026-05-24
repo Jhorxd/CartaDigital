@@ -6,7 +6,7 @@
     <title>{{ $tenant->name }} | Colección Exclusiva</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <script>
@@ -22,6 +22,7 @@
     </script>
 
     <style>
+        [x-cloak] { display: none !important; }
         :root { --brand-color: {{ $tenant->brand_color ?? '#cda25e' }}; }
         .bg-brand { background-color: var(--brand-color); }
         .text-brand { color: var(--brand-color); }
@@ -102,7 +103,7 @@
                 <div class="flex items-center gap-6">
                     {{-- Logo: las clases son independientes, el CSS split NO las toca --}}
                     @if($tenant->logo)
-                        <img src="{{ $tenant->logo }}" alt="{{ $tenant->name }}" class="h-14 w-auto object-contain">
+                        <img src="{{ $tenant->logo }}" alt="{{ $tenant->name }}" class="h-14 w-auto object-contain" loading="lazy" decoding="async">
                     @else
                         <div class="h-12 w-12 rounded-sm border-2 border-brand/40 flex items-center justify-center text-brand font-serif font-bold text-2xl">
                             {{ substr($tenant->name, 0, 1) }}
@@ -125,8 +126,25 @@
         <div class="nav-gradient-line h-[1px] w-full bg-gradient-to-r from-transparent via-brand to-transparent opacity-30 dark:opacity-50 absolute bottom-0"></div>
     </nav>
 
+    @php
+        $catalogCategories = $categories->map(fn ($cat) => [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'products' => $cat->products
+                ->where('is_active', true)
+                ->map(fn ($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'price' => (float) $p->price,
+                    'image' => $p->image ?: null,
+                    'description' => $p->description,
+                ])
+                ->values(),
+        ])->values();
+    @endphp
+
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" x-data="{ activeTab: {{ $categories->first()->id ?? 'null' }}, searchQuery: '{{ request('search') }}' }">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" x-data="catalogManager">
         
         <!-- Search Bar -->
         <div class="mb-12 max-w-lg mx-auto">
@@ -183,108 +201,51 @@
                 </div>
             </div>
 
-            <!-- Perfume Showcase Grid -->
+            <!-- Catálogo: un solo grid (datos en script, no HTML duplicado) -->
             <div class="min-h-[500px]">
-                <!-- Static Categories Grids -->
-                @foreach($categories as $category)
-                    <div x-show="activeTab === {{ $category->id }} && searchQuery === ''"
-                         x-transition:enter="transition ease-out duration-700 delay-100"
-                         x-transition:enter-start="opacity-0 transform translate-y-8"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16"
-                         style="display: none;">
-                        
-                        @foreach($category->products as $product)
-                            @if($product->is_active)
-                                <div class="luxury-card light bg-white dark:bg-gradient-to-br dark:from-[#161616] dark:to-[#0e0e0e] rounded-sm overflow-hidden flex flex-col group border border-gray-100 dark:border-white/5 relative">
-                                    <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
-                                    <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
-                                    
-                                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-black flex items-center justify-center p-8">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-gray-100 dark:from-[#121212] to-transparent opacity-80 z-0"></div>
-                                        
-                                        @if($product->image)
-                                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="absolute inset-0 w-full h-full object-contain p-4 relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl bg-white dark:bg-white/5 rounded-t-sm">
-                                        @else
-                                            <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-brand/20 group-hover:text-brand/40 transition-colors duration-500">
-                                                <svg class="w-24 h-24 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 22.5A3 3 0 0 0 22.5 19.5v-3.375c0-.986-.4-1.92-1.11-2.61l-5.64-5.55a1.5 1.5 0 0 0-1.5-.42L12 8A4.5 4.5 0 0 0 7.5 19.5v3H19.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m15.5 8-.5-1.5a1.5 1.5 0 0 0-.42-1.5L9 2.25A3 3 0 0 0 6 5.25v3.375c0 .986.4 1.92 1.11 2.61l5.64 5.55a1.5 1.5 0 0 0 1.5.42L16.5 16A4.5 4.5 0 0 0 21 4.5v-3H9" /></svg>
-                                            </div>
-                                        @endif
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
+                    <template x-for="product in filteredProducts()" :key="product.id">
+                        <div class="luxury-card light bg-white dark:bg-gradient-to-br dark:from-[#161616] dark:to-[#0e0e0e] rounded-sm overflow-hidden flex flex-col group border border-gray-100 dark:border-white/5 relative">
+                            <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
+                            <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
 
-                                        <div class="absolute top-4 right-4 z-20">
-                                            <span class="text-[10px] uppercase tracking-widest font-bold px-3 py-1 border border-brand/50 text-brand bg-white/80 dark:bg-transparent backdrop-blur-md rounded-sm">Disponible</span>
-                                        </div>
+                            <div class="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-black flex items-center justify-center p-8">
+                                <div class="absolute inset-0 bg-gradient-to-t from-gray-100 dark:from-[#121212] to-transparent opacity-80 z-0"></div>
+
+                                <template x-if="product.image">
+                                    <img :src="product.image" :alt="product.name" loading="lazy" decoding="async"
+                                         class="absolute inset-0 w-full h-full object-contain p-4 relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl bg-white dark:bg-white/5 rounded-t-sm">
+                                </template>
+                                <template x-if="!product.image">
+                                    <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-brand/20 group-hover:text-brand/40 transition-colors duration-500">
+                                        <svg class="w-24 h-24 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 22.5A3 3 0 0 0 22.5 19.5v-3.375c0-.986-.4-1.92-1.11-2.61l-5.64-5.55a1.5 1.5 0 0 0-1.5-.42L12 8A4.5 4.5 0 0 0 7.5 19.5v3H19.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m15.5 8-.5-1.5a1.5 1.5 0 0 0-.42-1.5L9 2.25A3 3 0 0 0 6 5.25v3.375c0 .986.4 1.92 1.11 2.61l5.64 5.55a1.5 1.5 0 0 0 1.5.42L16.5 16A4.5 4.5 0 0 0 21 4.5v-3H9" /></svg>
                                     </div>
-                                    
-                                    <div class="p-6 md:p-8 flex-1 flex flex-col items-center text-center bg-white dark:bg-[#121212] z-10">
-                                        <h3 class="font-serif text-lg md:text-xl text-gray-900 dark:text-white mb-3 tracking-wide group-hover:text-brand transition-colors duration-300 leading-snug">{{ $product->name }}</h3>
-                                        
-                                        @if($product->description)
-                                            <p class="text-[11px] text-gray-500 dark:text-white/50 mb-6 font-medium dark:font-light leading-relaxed flex-1 tracking-wide">{{ $product->description }}</p>
-                                        @endif
-                                        
-                                        <div class="mt-auto w-full pt-6 border-t border-gray-100 dark:border-white/5 flex flex-col items-center gap-4">
-                                            <span class="text-xl font-bold tracking-widest text-gray-900 dark:text-white">S/ {{ number_format($product->price, 2) }}</span>
-                                            
-                                            <button @click.prevent="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->price }}, image: '{{ $product->image }}' })"
-                                               class="w-full py-3 px-6 bg-transparent border border-brand text-brand hover:bg-brand hover:text-white dark:hover:text-black transition-all duration-300 text-[10px] uppercase tracking-[0.2em] font-bold text-center rounded-sm">
-                                                Añadir al Carrito
-                                            </button>
-                                        </div>
-                                    </div>
+                                </template>
+
+                                <div class="absolute top-4 right-4 z-20">
+                                    <span class="text-[10px] uppercase tracking-widest font-bold px-3 py-1 border border-brand/50 text-brand bg-white/80 dark:bg-transparent backdrop-blur-md rounded-sm">Disponible</span>
                                 </div>
-                            @endif
-                        @endforeach
-                    </div>
-                @endforeach
-                
-                <!-- Live Search Results Grid -->
-                <div x-cloak x-show="searchQuery !== ''"
-                     x-transition:enter="transition ease-out duration-500"
-                     x-transition:enter-start="opacity-0 transform translate-y-4"
-                     x-transition:enter-end="opacity-100 transform translate-y-0"
-                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-                     
-                     @php
-                        $allProducts = $categories->flatMap->products->unique('id')->where('is_active', true);
-                     @endphp
-                     
-                     @foreach($allProducts as $product)
-                         <div class="luxury-card light bg-white dark:bg-gradient-to-br dark:from-[#161616] dark:to-[#0e0e0e] rounded-sm overflow-hidden flex flex-col group border border-gray-100 dark:border-white/5 relative"
-                              x-show="'{{ mb_strtolower(addslashes($product->name), 'UTF-8') }}'.includes(searchQuery.toLowerCase().trim())"
-                              x-transition:enter="transition ease-out duration-300">
-                             <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
-                             <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-brand opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 m-2"></div>
-                             
-                             <div class="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-black flex items-center justify-center p-8">
-                                 <div class="absolute inset-0 bg-gradient-to-t from-gray-100 dark:from-[#121212] to-transparent opacity-80 z-0"></div>
-                                 
-                                 @if($product->image)
-                                     <img src="{{ $product->image }}" alt="{{ $product->name }}" class="absolute inset-0 w-full h-full object-contain p-4 relative z-10 group-hover:scale-110 transition-transform duration-1000 ease-in-out drop-shadow-2xl bg-white dark:bg-white/5 rounded-t-sm">
-                                 @else
-                                     <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-brand/20 group-hover:text-brand/40 transition-colors duration-500">
-                                         <svg class="w-24 h-24 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 22.5A3 3 0 0 0 22.5 19.5v-3.375c0-.986-.4-1.92-1.11-2.61l-5.64-5.55a1.5 1.5 0 0 0-1.5-.42L12 8A4.5 4.5 0 0 0 7.5 19.5v3H19.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m15.5 8-.5-1.5a1.5 1.5 0 0 0-.42-1.5L9 2.25A3 3 0 0 0 6 5.25v3.375c0 .986.4 1.92 1.11 2.61l5.64 5.55a1.5 1.5 0 0 0 1.5.42L16.5 16A4.5 4.5 0 0 0 21 4.5v-3H9" /></svg>
-                                     </div>
-                                 @endif
-                             </div>
-                             
-                             <div class="p-6 md:p-8 flex-1 flex flex-col items-center text-center bg-white dark:bg-[#121212] z-10">
-                                 <h3 class="font-serif text-lg md:text-xl text-gray-900 dark:text-white mb-3 tracking-wide group-hover:text-brand transition-colors duration-300 leading-snug">{{ $product->name }}</h3>
-                                 @if($product->description)
-                                     <p class="text-[11px] text-gray-500 dark:text-white/50 mb-6 font-medium dark:font-light leading-relaxed flex-1 tracking-wide">{{ $product->description }}</p>
-                                 @endif
-                                 <div class="mt-auto w-full pt-6 border-t border-gray-100 dark:border-white/5 flex flex-col items-center gap-4">
-                                     <span class="text-xl font-bold tracking-widest text-gray-900 dark:text-white">S/ {{ number_format($product->price, 2) }}</span>
-                                     <button @click.prevent="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->price }}, image: '{{ $product->image }}' })"
-                                        class="w-full py-3 px-6 bg-transparent border border-brand text-brand hover:bg-brand hover:text-white dark:hover:text-black transition-all duration-300 text-[10px] uppercase tracking-[0.2em] font-bold text-center rounded-sm">
-                                         Añadir al Carrito
-                                     </button>
-                                 </div>
-                             </div>
-                         </div>
-                     @endforeach
-                     
+                            </div>
+
+                            <div class="p-6 md:p-8 flex-1 flex flex-col items-center text-center bg-white dark:bg-[#121212] z-10">
+                                <h3 class="font-serif text-lg md:text-xl text-gray-900 dark:text-white mb-3 tracking-wide group-hover:text-brand transition-colors duration-300 leading-snug" x-text="product.name"></h3>
+                                <p x-show="product.description" x-text="product.description" class="text-[11px] text-gray-500 dark:text-white/50 mb-6 font-medium dark:font-light leading-relaxed flex-1 tracking-wide"></p>
+                                <div class="mt-auto w-full pt-6 border-t border-gray-100 dark:border-white/5 flex flex-col items-center gap-4">
+                                    <span class="text-xl font-bold tracking-widest text-gray-900 dark:text-white">S/ <span x-text="formatPrice(product.price)"></span></span>
+                                    <button type="button" @click.prevent="addToCart(product)"
+                                       class="w-full py-3 px-6 bg-transparent border border-brand text-brand hover:bg-brand hover:text-white dark:hover:text-black transition-all duration-300 text-[10px] uppercase tracking-[0.2em] font-bold text-center rounded-sm">
+                                        Añadir al Carrito
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
                 </div>
+
+                <p x-cloak x-show="searchQuery.trim() !== '' && filteredProducts().length === 0"
+                   class="text-center py-16 text-sm text-gray-400 dark:text-white/40 tracking-widest uppercase">
+                    No se encontraron productos
+                </p>
             </div>
         @else
             <div class="flex flex-col items-center justify-center py-32 opacity-30">
@@ -423,29 +384,66 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
+            const readStoredDarkMode = () => {
+                try {
+                    const value = localStorage.getItem('darkMode');
+                    return value === null ? null : value === 'true';
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            const writeStoredDarkMode = (value) => {
+                try {
+                    localStorage.setItem('darkMode', value);
+                } catch (e) {}
+            };
+
+            Alpine.data('catalogManager', () => ({
+                activeTab: @json($categories->first()?->id),
+                searchQuery: @json(request('search', '')),
+                categories: @json($catalogCategories),
+                filteredProducts() {
+                    const q = (this.searchQuery || '').toLowerCase().trim();
+                    if (q) {
+                        const seen = new Set();
+                        return this.categories.flatMap(c => c.products).filter(p => {
+                            if (seen.has(p.id)) return false;
+                            seen.add(p.id);
+                            return p.name.toLowerCase().includes(q);
+                        });
+                    }
+                    const cat = this.categories.find(c => c.id === this.activeTab);
+                    return cat ? cat.products : [];
+                },
+                formatPrice(value) {
+                    return Number(value).toLocaleString('es-PE', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    });
+                },
+            }));
+
             Alpine.data('themeManager', () => {
                 const tenantTheme = '{{ $tenant->theme ?? "auto" }}';
                 let initialDarkMode = true;
-                
+
                 if (tenantTheme === 'dark' || tenantTheme === 'split') {
-                    // body oscuro fijo (split: nav escapa via CSS nav-force-light)
                     initialDarkMode = true;
                 } else if (tenantTheme === 'light' || tenantTheme === 'split_dark') {
-                    // body claro fijo (split_dark: nav escapa via CSS nav-force-dark)
                     initialDarkMode = false;
                 } else {
-                    // auto: respeta preferencia guardada del navegador
-                    initialDarkMode = localStorage.getItem('darkMode') ? localStorage.getItem('darkMode') === 'true' : true;
+                    const stored = readStoredDarkMode();
+                    initialDarkMode = stored === null ? true : stored;
                 }
 
                 return {
                     darkMode: initialDarkMode,
                     themeSetting: tenantTheme,
                     toggleTheme() {
-                        // light y dark son fijos, no se pueden alternar
                         if (tenantTheme === 'light' || tenantTheme === 'dark') return;
                         this.darkMode = !this.darkMode;
-                        localStorage.setItem('darkMode', this.darkMode);
+                        writeStoredDarkMode(this.darkMode);
                     }
                 };
             });
