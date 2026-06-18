@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Colección Exclusiva</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -66,7 +67,7 @@
         .nav-force-dark .nav-gradient-line { opacity: 0.5 !important; }
     </style>
 </head>
-<body class="antialiased min-h-screen relative font-sans transition-colors duration-500 selection:bg-brand selection:text-white bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-white pb-24" x-data="cartManager">
+<body class="antialiased min-h-screen relative font-sans selection:bg-brand selection:text-white bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-white pb-24" x-data="cartManager">
 
     <!-- Theme Switcher: visible en modo auto, split y split_dark para alternar el body -->
     @if(empty($tenant->theme) || in_array($tenant->theme, ['auto', 'split', 'split_dark']))
@@ -384,20 +385,7 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            const readStoredDarkMode = () => {
-                try {
-                    const value = localStorage.getItem('darkMode');
-                    return value === null ? null : value === 'true';
-                } catch (e) {
-                    return null;
-                }
-            };
-
-            const writeStoredDarkMode = (value) => {
-                try {
-                    localStorage.setItem('darkMode', value);
-                } catch (e) {}
-            };
+            @include('carta.partials.theme-manager')
 
             Alpine.data('catalogManager', () => ({
                 activeTab: @json($categories->first()?->id),
@@ -423,30 +411,6 @@
                     });
                 },
             }));
-
-            Alpine.data('themeManager', () => {
-                const tenantTheme = '{{ $tenant->theme ?? "auto" }}';
-                let initialDarkMode = true;
-
-                if (tenantTheme === 'dark' || tenantTheme === 'split') {
-                    initialDarkMode = true;
-                } else if (tenantTheme === 'light' || tenantTheme === 'split_dark') {
-                    initialDarkMode = false;
-                } else {
-                    const stored = readStoredDarkMode();
-                    initialDarkMode = stored === null ? true : stored;
-                }
-
-                return {
-                    darkMode: initialDarkMode,
-                    themeSetting: tenantTheme,
-                    toggleTheme() {
-                        if (tenantTheme === 'light' || tenantTheme === 'dark') return;
-                        this.darkMode = !this.darkMode;
-                        writeStoredDarkMode(this.darkMode);
-                    }
-                };
-            });
 
             Alpine.data('cartManager', () => ({
                 cart: [],

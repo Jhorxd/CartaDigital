@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Urban Style</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -83,7 +84,7 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="antialiased font-sans bg-white text-slate-900 dark:bg-black dark:text-slate-100 transition-colors duration-300" x-data="cartManager">
+<body class="antialiased font-sans bg-white text-slate-900 dark:bg-black dark:text-slate-100" x-data="cartManager">
 
     <!-- Navbar Simple -->
     <nav class="sticky top-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-100 dark:border-white/10">
@@ -349,10 +350,8 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('themeManager', () => ({
-                darkMode: localStorage.getItem('darkMode') === 'true',
-                toggleTheme() { this.darkMode = !this.darkMode; localStorage.setItem('darkMode', this.darkMode); }
-            }));
+            @include('carta.partials.theme-manager')
+
             Alpine.data('cartManager', () => ({
                 cart: [], clientDetails: '', openDrawer: false,
                 showSizeModal: false, selectedProduct: null, selectedSize: null,

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Carta Digital Gastronómica</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -480,13 +481,7 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('themeManager', () => ({
-                darkMode: localStorage.getItem('darkMode') === 'true',
-                toggleTheme() {
-                    this.darkMode = !this.darkMode;
-                    localStorage.setItem('darkMode', this.darkMode);
-                }
-            }));
+            @include('carta.partials.theme-manager')
 
             Alpine.data('cartManager', () => ({
                 cart: [],

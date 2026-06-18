@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<html lang="es" x-data="themeManager" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Boutique de Arte Floral</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -70,8 +71,7 @@
         .pop-animation { animation: cart-pop 0.4s ease-out; }
     </style>
 </head>
-<body class="antialiased transition-colors duration-500 body-bg text-gray-900 dark:text-gray-100" 
-      x-data="cartStore" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))">
+<body class="antialiased body-bg text-gray-900 dark:text-gray-100" x-data="cartStore">
 
     @php
         $allProductsData = $categories->flatMap(fn($cat) => $cat->products->where('is_active', true))->unique('id')->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'price' => (float)$p->price, 'image' => $p->image, 'description' => $p->description])->values();
@@ -83,7 +83,7 @@
                 @if($tenant->logo) <img src="{{ $tenant->logo }}" class="h-10 md:h-14 w-auto scale-105"> @else <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white font-black text-xl"> {{ substr($tenant->name, 0, 1) }} </div> @endif
                 <div class="text-left"> <h1 class="text-xl md:text-2xl font-serif font-black tracking-tighter leading-none">{{ $tenant->name }}</h1> <p class="text-[8px] font-bold text-brand uppercase tracking-[0.4em]">Boutique de Arte Floral</p> </div>
             </div>
-            <button @click="darkMode = !darkMode" class="p-2 text-brand">
+            <button @click="toggleTheme" class="p-2 text-brand">
                 <svg x-show="!darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 <svg x-show="darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.071 16.071l.707.707M7.757 7.757l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
             </button>
@@ -223,6 +223,8 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
+            @include('carta.partials.theme-manager')
+
             Alpine.data('cartStore', () => ({
                 cart: [], openDrawer: false, clientName: '', clientDistrict: '', clientDept: '', deliveryDate: '', cardMessage: '', animateCart: false,
                 addToCart(p) { 
