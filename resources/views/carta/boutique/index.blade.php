@@ -6,9 +6,9 @@
     @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Colección Exclusiva</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'">
     
     <script>
         tailwind.config = {
@@ -471,7 +471,7 @@
                     message += `*TOTAL: S/ ${this.totalPrice.toFixed(2)}*`;
 
                     const url = `https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;
-                    window.open(url, '_blank');
+                    window.cartaOpen(url);
                 }
             }));
         });

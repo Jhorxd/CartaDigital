@@ -6,9 +6,9 @@
     @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Carta Digital Gastronómica</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" media="print" onload="this.media='all'">
 
     {{-- Color de marca dinámico del tenant --}}
     <style>
@@ -157,7 +157,7 @@
                  class="w-64 flex-shrink-0 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 group active:scale-95 transition-all">
                 <div class="h-40 relative">
                     <img src="{{ $product->image ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80' }}" 
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async">
                     <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
                         <span class="text-white font-black text-lg">S/ {{ number_format($product->price, 2) }}</span>
                     </div>
@@ -219,7 +219,7 @@
     <!-- Menu Content -->
     <main class="p-6 sm:p-8 space-y-12 pb-32">
         @foreach($categories as $category)
-        <section x-cloak x-show="search === '' ? (activeCategory == '{{ $category->id }}') : categoryHasResults('{{ $category->id }}')" 
+        <section x-show="search === '' ? (activeCategory == '{{ $category->id }}') : categoryHasResults('{{ $category->id }}')" 
                  x-transition:enter="transition ease-out duration-500"
                  x-transition:enter-start="opacity-0 translate-y-10 scale-95"
                  x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -556,26 +556,26 @@
                     }
 
                     const url = `https://wa.me/{{ $tenant->whatsapp }}?text=${encodeURIComponent(message)}`;
-                    window.open(url, '_blank');
+                    window.cartaOpen(url);
                 }
             }));
         });
 
         // Intersection Observer for Active Category Tabs
         window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section');
+            if (!window.Alpine) return;
+            const root = document.querySelector('[x-data="cartManager"]');
+            if (!root) return;
             let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 150) {
-                    current = section.getAttribute('id').replace('cat-', '');
+            document.querySelectorAll('section[id^="cat-"]').forEach(section => {
+                if (window.scrollY >= section.offsetTop - 150) {
+                    current = section.id.replace('cat-', '');
                 }
             });
-            if (current) {
-                const alpine = document.querySelector('[x-data="cartManager"]').__x.$data;
-                alpine.activeCategory = current;
-            }
-        });
+            if (!current) return;
+            const data = Alpine.$data(root);
+            if (data) data.activeCategory = current;
+        }, { passive: true });
     </script>
 </body>
 </html>

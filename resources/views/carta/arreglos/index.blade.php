@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Boutique de Arte Floral</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
     
     <script>
         tailwind.config = {
@@ -126,7 +126,7 @@
                         @if($product->is_active)
                             <div class="luxury-card rounded-[2.5rem] overflow-hidden flex flex-col group relative">
                                 <div class="relative aspect-[3/4] overflow-hidden bg-gray-50 dark:bg-zinc-800 flex items-center justify-center">
-                                    @if($product->image) <img src="{{ $product->image }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"> @else <div class="flex flex-col items-center gap-3 opacity-20"> <svg class="w-16 h-16 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1" d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"></path></svg> <span class="text-[8px] font-black uppercase tracking-widest">Arte Floral</span> </div> @endif
+                                    @if($product->image) <img src="{{ $product->image }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async"> @else <div class="flex flex-col items-center gap-3 opacity-20"> <svg class="w-16 h-16 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1" d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"></path></svg> <span class="text-[8px] font-black uppercase tracking-widest">Arte Floral</span> </div> @endif
                                     <div class="absolute top-4 left-4 z-10">
                                         <div class="price-badge transform -rotate-1 group-hover:rotate-3 transition-transform"> <span class="price-currency text-brand">S/</span> <span class="price-amount text-gray-900 dark:text-white text-base md:text-xl">{{ number_format($product->price, 2) }}</span> </div>
                                     </div>
@@ -251,7 +251,7 @@
                     m += `*Productos:*\n`;
                     this.cart.forEach(i => { m += `✅ ${i.quantity}x ${i.name} (S/ ${i.price.toFixed(2)})\n`; });
                     m += `\n*TOTAL: S/ ${this.totalPrice.toFixed(2)}*`;
-                    window.open(`https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(m)}`, '_blank');
+                    window.cartaOpen(`https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(m)}`);
                 }
             }));
         });

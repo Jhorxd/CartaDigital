@@ -69,6 +69,13 @@
         </div>
 
         <script>
+            function hideGlobalLoader() {
+                const loader = document.getElementById('global-loader');
+                if (!loader) return;
+                loader.classList.add('hidden');
+                loader.classList.remove('flex');
+            }
+
             document.addEventListener('DOMContentLoaded', () => {
                 const forms = document.querySelectorAll('form');
                 forms.forEach(form => {
@@ -81,6 +88,12 @@
                         loader.classList.add('flex');
                     });
                 });
+            });
+
+            // iPhone: al volver a Safari la página restaurada puede quedar tapada por el loader
+            window.addEventListener('pageshow', hideGlobalLoader);
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') hideGlobalLoader();
             });
         </script>
     </body>

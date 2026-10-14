@@ -6,9 +6,9 @@
     @include('carta.partials.theme-init')
     <title>{{ $tenant->name }} | Urban Style</title>
     <link rel="icon" type="image/png" href="{{ $tenant->logo ?? asset('favicon.png') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" media="print" onload="this.media='all'">
     
     <script>
         tailwind.config = {
@@ -189,7 +189,7 @@
 
                                 <div class="image-container rounded-lg overflow-hidden flex items-center justify-center group">
                                     @if($product->image)
-                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async">
                                     @endif
                                 </div>
                                 
@@ -403,12 +403,10 @@
                     const m = `🔥🔥 *NUEVO PEDIDO: {{ $tenant->name }}* 🔥🔥\n\n` + 
                             this.cart.map(i => `👟 *${i.quantity}x ${i.name.toUpperCase()}*\n   Marca: ${i.brand || 'Urban'}\n   Precio: S/ ${i.price}`).join('\n\n') + 
                             `\n\n💰 *TOTAL A PAGAR: S/ ${this.totalPrice}*\n\n👤 *CLIENTE:* ${this.clientDetails.toUpperCase()}\n\n_Enviado desde el catálogo digital_`;
-                    window.open(`https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(m)}`, '_blank');
+                    window.cartaOpen(`https://wa.me/51{{ $tenant->whatsapp }}?text=${encodeURIComponent(m)}`);
                 }
             }));
         });
     </script>
-</body>
-</html>
 </body>
 </html>
