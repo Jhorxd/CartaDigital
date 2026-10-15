@@ -10,8 +10,8 @@
     <script defer src="{{ asset('js/alpine.min.js') }}"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" media="print" onload="this.media='all'">
     
-    <script>
-        tailwind.config = {
+    <script type="module">
+        window.tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {

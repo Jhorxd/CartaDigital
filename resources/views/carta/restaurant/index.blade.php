@@ -17,8 +17,8 @@
         }
     </style>
 
-    <script>
-        tailwind.config = {
+    <script type="module">
+        window.tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {

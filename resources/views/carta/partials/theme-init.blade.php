@@ -33,6 +33,8 @@
 <style>
     html { background-color: #f9fafb; color-scheme: light; }
     html.dark { background-color: #0a0a0a; color-scheme: dark; }
+    /* El HTML se pinta antes que Tailwind. Hasta que el CSS existe, no se muestra el contenido desordenado. */
+    html:not(.css-ready) body { visibility: hidden; }
     html.theme-ready body {
         transition: background-color 0.3s ease, color 0.3s ease;
     }
@@ -53,9 +55,39 @@
     }
 </style>
 <script>
-    requestAnimationFrame(function () {
+(function () {
+    function styled() {
+        var config = window.tailwind && window.tailwind.config;
+        if (!config || config.darkMode !== 'class') return false;
+        var nodes = document.getElementsByTagName('style');
+        for (var i = 0; i < nodes.length; i++) {
+            var text = nodes[i].textContent || '';
+            if (text.indexOf('--tw-') !== -1 && text.indexOf('.dark') !== -1) return true;
+        }
+        return false;
+    }
+
+    function show() {
+        document.documentElement.classList.add('css-ready');
         document.documentElement.classList.add('theme-ready');
+    }
+
+    if (styled()) {
+        show();
+        return;
+    }
+
+    var observer = new MutationObserver(function () {
+        if (!styled()) return;
+        observer.disconnect();
+        show();
     });
+    observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+    setTimeout(function () {
+        observer.disconnect();
+        show();
+    }, 5000);
+})();
 </script>
 <script>
 (function () {
